@@ -1,0 +1,29 @@
+{
+  "name": "footprint_logger",
+  "version": "1.0.0",
+  "description": "A footprint logger",
+  "main": "index.html",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superUserT/footprint_logger.git"
+  },
+  "keywords": [
+    "node"
+  ],
+  "author": {
+    "name": "Thabiso Rantsho",
+    "email": "thabiso.rantsho@Umuzi.org",
+    "github": "https://github.com/superUserT"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/superUserT/footprint_logger/issues"
+  },
+  "homepage": "https://github.com/superUserT/footprint_logger#readme",
+  "devDependencies": {
+    "jasmine": "^5.8.0"
+  }
+}
