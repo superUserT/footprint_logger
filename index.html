@@ -9,6 +9,16 @@
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
     />
+    <style>
+      .activity-details {
+        display: none;
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        background-color: #f9fafb;
+      }
+    </style>
   </head>
   <body class="bg-gray-100 min-h-screen">
     <!-- Floating Navbar -->
@@ -65,6 +75,7 @@
               name="dailyActivity"
               class="mt-1 p-2 w-full border rounded-md"
               required
+              onchange="showActivityDetails(this.value)"
             >
               <option value="">-- Select an Activity --</option>
               <option value="carTravel">Car Travel</option>
@@ -76,6 +87,188 @@
               <option value="watchTV">Watched TV</option>
               <option value="orderedIn">Ordered In</option>
             </select>
+          </div>
+
+          <!-- Car Travel Details -->
+          <div id="carTravelDetails" class="activity-details">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700"
+                >Vehicle Type:</label
+              >
+              <select
+                name="vehicleType"
+                class="mt-1 p-2 w-full border rounded-md"
+              >
+                <option value="">-- Select Vehicle Type --</option>
+                <option value="smallCar">Small Car</option>
+                <option value="mediumCar">Medium Car</option>
+                <option value="largeCar">Large Car</option>
+                <option value="suv">SUV</option>
+                <option value="pickupTruck">Pickup Truck</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700"
+                >Fuel Type:</label
+              >
+              <select name="fuelType" class="mt-1 p-2 w-full border rounded-md">
+                <option value="">-- Select Fuel Type --</option>
+                <option value="petrol">Petrol</option>
+                <option value="diesel">Diesel</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="electric">Electric</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Distance (km):</label
+              >
+              <input
+                type="number"
+                name="distance"
+                step="0.1"
+                min="0"
+                class="mt-1 p-2 w-full border rounded-md"
+                placeholder="Enter distance in kilometers"
+              />
+            </div>
+          </div>
+
+          <!-- Meat Consumption Details -->
+          <div id="meatConsumptionDetails" class="activity-details">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700"
+                >Meat Type:</label
+              >
+              <select name="meatType" class="mt-1 p-2 w-full border rounded-md">
+                <option value="">-- Select Meat Type --</option>
+                <option value="beef">Beef</option>
+                <option value="pork">Pork</option>
+                <option value="chicken">Chicken</option>
+                <option value="fish">Fish</option>
+                <option value="lamb">Lamb</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Quantity (grams):</label
+              >
+              <input
+                type="number"
+                name="meatQuantity"
+                min="0"
+                class="mt-1 p-2 w-full border rounded-md"
+                placeholder="Enter quantity in grams"
+              />
+            </div>
+          </div>
+
+          <!-- Electricity Use Details -->
+          <div id="electricityUseDetails" class="activity-details">
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Electricity Usage (kWh):</label
+              >
+              <input
+                type="number"
+                name="electricityUsage"
+                step="0.1"
+                min="0"
+                class="mt-1 p-2 w-full border rounded-md"
+                placeholder="Enter electricity usage in kWh"
+              />
+            </div>
+          </div>
+
+          <!-- Hot Shower Details -->
+          <div id="hotShowerDetails" class="activity-details">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700"
+                >Shower Duration (minutes):</label
+              >
+              <input
+                type="number"
+                name="showerDuration"
+                min="0"
+                class="mt-1 p-2 w-full border rounded-md"
+                placeholder="Enter shower duration in minutes"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Water Flow Rate (liters per minute):</label
+              >
+              <select
+                name="waterFlowRate"
+                class="mt-1 p-2 w-full border rounded-md"
+              >
+                <option value="">-- Select Flow Rate --</option>
+                <option value="low">Low (5-7 L/min)</option>
+                <option value="medium">Medium (8-10 L/min)</option>
+                <option value="high">High (11+ L/min)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Watched TV Details -->
+          <div id="watchTVDetails" class="activity-details">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700"
+                >TV Type:</label
+              >
+              <select name="tvType" class="mt-1 p-2 w-full border rounded-md">
+                <option value="">-- Select TV Type --</option>
+                <option value="led">LED</option>
+                <option value="lcd">LCD</option>
+                <option value="plasma">Plasma</option>
+                <option value="oled">OLED</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Duration (hours):</label
+              >
+              <input
+                type="number"
+                name="tvDuration"
+                step="0.1"
+                min="0"
+                class="mt-1 p-2 w-full border rounded-md"
+                placeholder="Enter duration in hours"
+              />
+            </div>
+          </div>
+
+          <!-- Ordered In Details -->
+          <div id="orderedInDetails" class="activity-details">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700"
+                >Food Type:</label
+              >
+              <select name="foodType" class="mt-1 p-2 w-full border rounded-md">
+                <option value="">-- Select Food Type --</option>
+                <option value="fastFood">Fast Food</option>
+                <option value="restaurant">Restaurant Meal</option>
+                <option value="healthy">Healthy Meal</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Packaging Type:</label
+              >
+              <select
+                name="packagingType"
+                class="mt-1 p-2 w-full border rounded-md"
+              >
+                <option value="">-- Select Packaging --</option>
+                <option value="plastic">Plastic</option>
+                <option value="paper">Paper</option>
+                <option value="mixed">Mixed Materials</option>
+                <option value="reusable">Reusable</option>
+              </select>
+            </div>
           </div>
 
           <div class="flex justify-between">
@@ -110,8 +303,5 @@
     <!-- Footer -->
 
     <script src="src/logger_logic.js"></script>
-    <script>
-      const email = "{{ email }}";
-    </script>
   </body>
 </html>
