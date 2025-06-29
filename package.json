@@ -24,6 +24,10 @@
   },
   "homepage": "https://github.com/superUserT/footprint_logger#readme",
   "devDependencies": {
-    "jasmine": "^5.8.0"
+    "jasmine": "^5.8.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
   }
 }

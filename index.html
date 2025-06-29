@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Standup</title>
+    <link rel="icon" type="image/png" href="../images/Logo.png" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- Floating Navbar -->
+    <nav class="floating-navbar bg-blue-600 p-4 text-white">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="text-lg font-bold">Footprint Logger</div>
+        <ul class="flex space-x-6">
+          <li><a href="/home" class="hover:underline">Home</a></li>
+          <li><a href="/dashboard" class="hover:underline">Dashboard</a></li>
+          <li><a href="/dashboard" class="hover:underline">Dashboard</a></li>
+          <li><a href="/logout" class="hover:underline">Logout</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Daily Standup Form -->
+    <div class="flex items-center justify-center mt-8">
+      <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+        <h2 class="text-2xl font-bold text-center mb-6">Logger Input</h2>
+        <form id="dailyStandupForm" class="space-y-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700"
+              >Name:</label
+            >
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="mt-1 p-2 w-full border rounded-md"
+              required
+            />
+          </div>
+          <div>
+            <label for="date" class="block text-sm font-medium text-gray-700"
+              >Date:</label
+            >
+            <input
+              type="date"
+              id="date"
+              name="date"
+              class="mt-1 p-2 w-full border rounded-md"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              for="dailyActivity"
+              class="block text-sm font-medium text-gray-700"
+              >Daily Activity:</label
+            >
+            <select
+              id="dailyActivity"
+              name="dailyActivity"
+              class="mt-1 p-2 w-full border rounded-md"
+              required
+            >
+              <option value="">-- Select an Activity --</option>
+              <option value="carTravel">Car Travel</option>
+              <option value="meatConsumption">Meat Consumption</option>
+              <option value="electricityUse">
+                Normal Electricity use for the Day
+              </option>
+              <option value="hotShower">Hot Shower</option>
+              <option value="watchTV">Watched TV</option>
+              <option value="orderedIn">Ordered In</option>
+            </select>
+          </div>
+
+          <div class="flex justify-between">
+            <button
+              type="submit"
+              id="submitDailyStandup"
+              class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+            >
+              Submit
+            </button>
+            <button
+              type="button"
+              id="editDailyStandup"
+              class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              hidden
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              id="deleteDailyStandup"
+              class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+              hidden
+            >
+              Delete
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+
+    <script src="src/logger_logic.js"></script>
+    <script>
+      const email = "{{ email }}";
+    </script>
+  </body>
+</html>
