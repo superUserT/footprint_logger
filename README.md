@@ -4,12 +4,12 @@
 
 ### Build a front-end app using HTML, CSS, and JavaScript that allows users to:
 
-● Select or input daily activities (e.g., car travel, meat consumption, electricity use)
-● Automatically assign a CO2 value to each activity
-● View a running total of emissions
-● Display a visual summary (e.g., a bar or pie chart)
-● Filter activities by category (e.g., food, transport, energy)
-● Use localStorage to save data between sessions
+- ● Select or input daily activities (e.g., car travel, meat consumption, electricity use)
+- ● Automatically assign a CO2 value to each activity
+- ● View a running total of emissions
+- ● Display a visual summary (e.g., a bar or pie chart)
+- ● Filter activities by category (e.g., food, transport, energy)
+- ● Use localStorage to save data between sessions
 
 ## How ot run the project
 
