@@ -1,0 +1,60 @@
+[
+  {
+    "name": "John Doe",
+    "date": "2023-11-15",
+    "dailyActivity": "carTravel",
+    "timestamp": "2023-11-15T10:30:00.000Z",
+    "vehicleType": "mediumCar",
+    "fuelType": "petrol",
+    "distance": "45.5",
+    "id": "1700037000000",
+    "co2": 5.46
+  },
+  {
+    "name": "Jane Smith",
+    "date": "2023-11-14",
+    "dailyActivity": "electricityUse",
+    "timestamp": "2023-11-14T18:45:00.000Z",
+    "electricityUsage": "12.3",
+    "id": "1699950300000",
+    "co2": 6.15
+  },
+  {
+    "name": "John Doe",
+    "date": "2023-11-13",
+    "dailyActivity": "meatConsumption",
+    "timestamp": "2023-11-13T12:30:00.000Z",
+    "meatType": "beef",
+    "meatQuantity": "250",
+    "id": "1699864200000",
+    "co2": 6.75
+  },
+  {
+    "name": "Malume Thabo",
+    "date": "2025-07-03",
+    "dailyActivity": "carTravel",
+    "timestamp": "2025-07-03T11:52:14.266Z",
+    "vehicleType": "smallCar",
+    "fuelType": "petrol",
+    "distance": 22,
+    "id": "1751543534266"
+  },
+  {
+    "name": "Thabang Zulu",
+    "date": "2025-07-03",
+    "dailyActivity": "watchTV",
+    "timestamp": "2025-07-03T12:22:52.210Z",
+    "tvType": "lcd",
+    "tvDuration": 23,
+    "id": "1751545372210"
+  },
+  {
+    "name": "Thabiso Rantsho",
+    "date": "2025-07-03",
+    "dailyActivity": "watchTV",
+    "timestamp": "2025-07-03T12:23:40.785Z",
+    "tvType": "lcd",
+    "tvDuration": 22,
+    "id": "1751545420785"
+  }
+]

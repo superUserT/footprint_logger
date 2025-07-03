@@ -27,9 +27,7 @@
         <div class="text-lg font-bold">Footprint Logger</div>
         <ul class="flex space-x-6">
           <li><a href="/home" class="hover:underline">Home</a></li>
-          <li>
-            <a href="src/dashboard.html" class="hover:underline">Dashboard</a>
-          </li>
+          <li><a href="/dashboard " class="hover:underline">Dashboard</a></li>
         </ul>
       </div>
     </nav>
@@ -196,7 +194,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700"
-                >Water Flow Rate (liters per minute):</label
+                >Water Flow Rate:</label
               >
               <select
                 name="waterFlowRate"
@@ -245,7 +243,11 @@
               <label class="block text-sm font-medium text-gray-700"
                 >Food Type:</label
               >
-              <select name="foodType" class="mt-1 p-2 w-full border rounded-md">
+              <select
+                name="foodType"
+                class="mt-1 p-2 w-full border rounded-md"
+                required
+              >
                 <option value="">-- Select Food Type --</option>
                 <option value="fastFood">Fast Food</option>
                 <option value="restaurant">Restaurant Meal</option>
@@ -261,6 +263,7 @@
               <select
                 name="packagingType"
                 class="mt-1 p-2 w-full border rounded-md"
+                required
               >
                 <option value="">-- Select Packaging --</option>
                 <option value="plastic">Plastic</option>
@@ -279,29 +282,187 @@
             >
               Submit
             </button>
-            <button
-              type="button"
-              id="editDailyStandup"
-              class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              hidden
-            >
-              Edit
-            </button>
-            <button
-              type="button"
-              id="deleteDailyStandup"
-              class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-              hidden
-            >
-              Delete
-            </button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- Footer -->
+    <script>
+      function showActivityDetails(activity) {
+        document.querySelectorAll(".activity-details").forEach((el) => {
+          el.style.display = "none";
 
-    <script src="src/logger_logic.js"></script>
+          el.querySelectorAll("input, select").forEach((field) => {
+            field.removeAttribute("required");
+          });
+        });
+
+        if (activity) {
+          const detailsElement = document.getElementById(`${activity}Details`);
+          if (detailsElement) {
+            detailsElement.style.display = "block";
+
+            detailsElement
+              .querySelectorAll("input, select")
+              .forEach((field) => {
+                field.setAttribute("required", "required");
+              });
+          }
+        }
+      }
+
+      function getActivitySpecificData() {
+        const activity = document.getElementById("dailyActivity").value;
+        const data = {};
+
+        switch (activity) {
+          case "carTravel":
+            const vehicleType = document.querySelector('[name="vehicleType"]');
+            const fuelType = document.querySelector('[name="fuelType"]');
+            const distance = document.querySelector('[name="distance"]');
+
+            if (!vehicleType?.value || !fuelType?.value || !distance?.value) {
+              throw new Error("Please fill in all car travel details");
+            }
+
+            data.vehicleType = vehicleType.value;
+            data.fuelType = fuelType.value;
+            data.distance = parseFloat(distance.value);
+            break;
+
+          case "meatConsumption":
+            const meatType = document.querySelector('[name="meatType"]');
+            const meatQuantity = document.querySelector(
+              '[name="meatQuantity"]'
+            );
+
+            if (!meatType?.value || !meatQuantity?.value) {
+              throw new Error("Please fill in all meat consumption details");
+            }
+
+            data.meatType = meatType.value;
+            data.meatQuantity = parseInt(meatQuantity.value);
+            break;
+
+          case "electricityUse":
+            const electricityUsage = document.querySelector(
+              '[name="electricityUsage"]'
+            );
+
+            if (!electricityUsage?.value) {
+              throw new Error("Please fill in electricity usage");
+            }
+
+            data.electricityUsage = parseFloat(electricityUsage.value);
+            break;
+
+          case "hotShower":
+            const showerDuration = document.querySelector(
+              '[name="showerDuration"]'
+            );
+            const waterFlowRate = document.querySelector(
+              '[name="waterFlowRate"]'
+            );
+
+            if (!showerDuration?.value || !waterFlowRate?.value) {
+              throw new Error("Please fill in all shower details");
+            }
+
+            data.showerDuration = parseInt(showerDuration.value);
+            data.waterFlowRate = waterFlowRate.value;
+            break;
+
+          case "watchTV":
+            const tvType = document.querySelector('[name="tvType"]');
+            const tvDuration = document.querySelector('[name="tvDuration"]');
+
+            if (!tvType?.value || !tvDuration?.value) {
+              throw new Error("Please fill in all TV watching details");
+            }
+
+            data.tvType = tvType.value;
+            data.tvDuration = parseFloat(tvDuration.value);
+            break;
+
+          case "orderedIn":
+            const foodType = document.querySelector('[name="foodType"]');
+            const packagingType = document.querySelector(
+              '[name="packagingType"]'
+            );
+
+            if (!foodType?.value || !packagingType?.value) {
+              throw new Error("Please fill in all ordering details");
+            }
+
+            data.foodType = foodType.value;
+            data.packagingType = packagingType.value;
+            break;
+        }
+
+        return data;
+      }
+
+      document
+        .getElementById("dailyStandupForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          console.log("Form submission started...");
+
+          const formData = {
+            name: document.getElementById("name").value,
+            date: document.getElementById("date").value,
+            dailyActivity: document.getElementById("dailyActivity").value,
+            timestamp: new Date().toISOString(),
+            ...getActivitySpecificData(),
+          };
+
+          console.log("Form data:", formData);
+
+          if (!formData.name || !formData.date || !formData.dailyActivity) {
+            alert("Please fill in all required fields");
+            return;
+          }
+
+          const submitButton = document.getElementById("submitDailyStandup");
+          const originalText = submitButton.textContent;
+          submitButton.textContent = "Submitting...";
+          submitButton.disabled = true;
+
+          try {
+            const response = await fetch("/api/activities", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+            });
+
+            console.log("Response status:", response.status);
+
+            if (response.ok) {
+              const result = await response.json();
+              console.log("Success:", result);
+              alert("Activity saved successfully!");
+              this.reset();
+              document.querySelectorAll(".activity-details").forEach((el) => {
+                el.style.display = "none";
+              });
+            } else {
+              const errorText = await response.text();
+              console.error("Server error:", errorText);
+              throw new Error(
+                `Server error: ${response.status} - ${errorText}`
+              );
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error saving activity: " + error.message);
+          } finally {
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+          }
+        });
+    </script>
   </body>
 </html>

@@ -4,7 +4,8 @@
   "description": "A footprint logger",
   "main": "index.html",
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -25,9 +26,12 @@
   "homepage": "https://github.com/superUserT/footprint_logger#readme",
   "devDependencies": {
     "jasmine": "^5.8.0",
+    "nodemon": "^3.1.10",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "lodash": "^4.17.21"
   }
 }
