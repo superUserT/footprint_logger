@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carbon Footprint Dashboard</title>
+    <link rel="icon" type="image/png" href="../images/Logo.png" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .chart-container {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        height: 400px;
+      }
+      .chart-canvas {
+        max-height: 300px !important;
+        height: 300px !important;
+      }
+      .summary-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .floating-navbar {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .table-container {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- Floating Navbar -->
+    <nav class="floating-navbar bg-blue-600 p-4 text-white sticky top-0 z-10">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="text-lg font-bold">Carbon Footprint Dashboard</div>
+        <ul class="flex space-x-6">
+          <li><a href="/home" class="hover:underline">Logger</a></li>
+          <li>
+            <a href="/dashboard" class="hover:underline font-semibold"
+              >Dashboard</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">
+        Your Carbon Footprint Overview
+      </h1>
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="summary-card hover:shadow-md transition-shadow">
+          <h3 class="text-lg font-semibold mb-2 text-gray-700">
+            Total CO2 Emissions
+          </h3>
+          <p id="totalEmissions" class="text-3xl font-bold text-blue-600">
+            0 kg
+          </p>
+          <p class="text-sm text-gray-500 mt-1">Lifetime carbon footprint</p>
+        </div>
+        <div class="summary-card hover:shadow-md transition-shadow">
+          <h3 class="text-lg font-semibold mb-2 text-gray-700">
+            Activities Logged
+          </h3>
+          <p id="totalActivities" class="text-3xl font-bold text-green-600">
+            0
+          </p>
+          <p class="text-sm text-gray-500 mt-1">Total entries recorded</p>
+        </div>
+        <div class="summary-card hover:shadow-md transition-shadow">
+          <h3 class="text-lg font-semibold mb-2 text-gray-700">
+            Main Emission Source
+          </h3>
+          <p id="mainSource" class="text-3xl font-bold text-red-600">-</p>
+          <p id="mainSourceValue" class="text-sm text-gray-500 mt-1">
+            Your highest impact activity
+          </p>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Bar Chart -->
+        <div class="chart-container hover:shadow-md transition-shadow">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700">
+            Emissions by Category (kg CO2)
+          </h2>
+          <div class="relative">
+            <canvas id="barChart" class="chart-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="chart-container hover:shadow-md transition-shadow">
+          <h2 class="text-xl font-semibold mb-4 text-gray-700">
+            Activity Distribution (%)
+          </h2>
+          <div class="relative">
+            <canvas id="pieChart" class="chart-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activities Table -->
+      <div class="table-container hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-700">Recent Activities</h2>
+          <button
+            id="refreshBtn"
+            class="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 text-sm flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Refresh
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white rounded-lg overflow-hidden">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date
+                </th>
+                <th
+                  class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Activity
+                </th>
+                <th
+                  class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Details
+                </th>
+                <th
+                  class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  CO2 (kg)
+                </th>
+              </tr>
+            </thead>
+            <tbody id="activitiesTableBody" class="divide-y divide-gray-200">
+              <tr>
+                <td colspan="4" class="py-4 text-center text-gray-500">
+                  Loading data...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let barChart, pieChart;
+
+      // Sample data for demo
+      const sampleData = [
+        {
+          name: "John Doe",
+          date: "2023-11-15",
+          dailyActivity: "carTravel",
+          timestamp: "2023-11-15T10:30:00.000Z",
+          vehicleType: "mediumCar",
+          fuelType: "petrol",
+          distance: "45.5",
+          id: "1700037000000",
+          co2: 5.46,
+        },
+        {
+          name: "Jane Smith",
+          date: "2023-11-14",
+          dailyActivity: "electricityUse",
+          timestamp: "2023-11-14T18:45:00.000Z",
+          electricityUsage: "12.3",
+          id: "1699950300000",
+          co2: 6.15,
+        },
+        {
+          name: "John Doe",
+          date: "2023-11-13",
+          dailyActivity: "meatConsumption",
+          timestamp: "2023-11-13T12:30:00.000Z",
+          meatType: "beef",
+          meatQuantity: "250",
+          id: "1699864200000",
+          co2: 6.75,
+        },
+      ];
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadData();
+        document
+          .getElementById("refreshBtn")
+          .addEventListener("click", loadData);
+      });
+
+      async function loadData() {
+        try {
+          // Show loading state
+          document.getElementById("activitiesTableBody").innerHTML = `
+            <tr>
+              <td colspan="4" class="py-4 text-center text-gray-500">
+                <div class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                <span class="ml-2">Loading data...</span>
+              </td>
+            </tr>
+          `;
+
+          const response = await fetch("http://localhost:3000/api/activities");
+          if (!response.ok) throw new Error("Failed to fetch data");
+          const activities = await response.json();
+          updateDashboard(activities);
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById("activitiesTableBody").innerHTML = `
+            <tr>
+              <td colspan="4" class="py-4 text-center text-red-500">Error loading data. Please try again.</td>
+            </tr>
+          `;
+        }
+      }
+
+      function updateDashboard(activities) {
+        document.getElementById("totalActivities").textContent =
+          activities.length;
+
+        const emissions = calculateEmissions(activities);
+        document.getElementById(
+          "totalEmissions"
+        ).textContent = `${emissions.total.toFixed(2)} kg`;
+
+        const mainSource = Object.entries(emissions.byCategory).reduce(
+          (a, b) => (a[1] > b[1] ? a : b),
+          ["", 0]
+        );
+        document.getElementById("mainSource").textContent = formatCategoryName(
+          mainSource[0]
+        );
+        document.getElementById("mainSourceValue").textContent = `${(
+          mainSource[1] || 0
+        ).toFixed(2)} kg CO2`;
+
+        renderCharts(emissions.byCategory, emissions.total);
+
+        renderRecentActivities(activities);
+      }
+
+      function calculateEmissions(activities) {
+        const emissionFactors = {
+          carTravel: 0.12,
+          meatConsumption: {
+            beef: 0.027,
+            pork: 0.012,
+            chicken: 0.006,
+            fish: 0.005,
+            lamb: 0.024,
+          },
+          electricityUse: 0.5,
+          hotShower: 0.002,
+          watchTV: 0.05,
+          orderedIn: 0.001,
+        };
+
+        const byCategory = {
+          carTravel: 0,
+          meatConsumption: 0,
+          electricityUse: 0,
+          hotShower: 0,
+          watchTV: 0,
+          orderedIn: 0,
+        };
+
+        activities.forEach((activity) => {
+          let co2 = 0;
+          switch (activity.dailyActivity) {
+            case "carTravel":
+              co2 =
+                (parseFloat(activity.distance) || 0) *
+                emissionFactors.carTravel;
+              break;
+            case "meatConsumption":
+              const meatType = activity.meatType || "beef";
+              const meatFactor = emissionFactors.meatConsumption[meatType] || 0;
+              co2 = (parseFloat(activity.meatQuantity) || 0) * meatFactor;
+              break;
+            case "electricityUse":
+              co2 =
+                (parseFloat(activity.electricityUsage) || 0) *
+                emissionFactors.electricityUse;
+              break;
+            case "hotShower":
+              const flowRate =
+                activity.waterFlowRate === "low"
+                  ? 6
+                  : activity.waterFlowRate === "medium"
+                  ? 9
+                  : 11;
+              co2 =
+                (parseFloat(activity.showerDuration) || 0) *
+                flowRate *
+                emissionFactors.hotShower;
+              break;
+            case "watchTV":
+              co2 =
+                (parseFloat(activity.tvDuration) || 0) *
+                emissionFactors.watchTV;
+              break;
+            case "orderedIn":
+              co2 = 500 * emissionFactors.orderedIn;
+              break;
+          }
+          byCategory[activity.dailyActivity] += co2;
+          activity.co2 = co2;
+        });
+
+        return {
+          total: Object.values(byCategory).reduce((sum, val) => sum + val, 0),
+          byCategory,
+        };
+      }
+
+      function renderCharts(emissionsData, totalEmissions) {
+        const categories = Object.keys(emissionsData).map(formatCategoryName);
+        const data = Object.values(emissionsData);
+        const backgroundColors = [
+          "rgba(255, 99, 132, 0.7)",
+          "rgba(54, 162, 235, 0.7)",
+          "rgba(255, 206, 86, 0.7)",
+          "rgba(75, 192, 192, 0.7)",
+          "rgba(153, 102, 255, 0.7)",
+          "rgba(255, 159, 64, 0.7)",
+        ];
+
+        if (barChart) barChart.destroy();
+        if (pieChart) pieChart.destroy();
+
+        const barCtx = document.getElementById("barChart").getContext("2d");
+        barChart = new Chart(barCtx, {
+          type: "bar",
+          data: {
+            labels: categories,
+            datasets: [
+              {
+                label: "CO2 Emissions (kg)",
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: backgroundColors.map((c) => c.replace("0.7", "1")),
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Kilograms of CO2",
+                },
+              },
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return `${context.parsed.y.toFixed(2)} kg CO2`;
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        const pieCtx = document.getElementById("pieChart").getContext("2d");
+        pieChart = new Chart(pieCtx, {
+          type: "pie",
+          data: {
+            labels: categories,
+            datasets: [
+              {
+                data: data,
+                backgroundColor: backgroundColors,
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "right",
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const value = context.raw || 0;
+                    const percentage = ((value / totalEmissions) * 100).toFixed(
+                      1
+                    );
+                    return `${context.label}: ${value.toFixed(
+                      2
+                    )} kg (${percentage}%)`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function renderRecentActivities(activities) {
+        const tbody = document.getElementById("activitiesTableBody");
+        const recent = activities.slice().reverse().slice(0, 10);
+
+        if (recent.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="4" class="py-4 text-center text-gray-500">No activities recorded yet</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = recent
+          .map(
+            (activity) => `
+          <tr class="hover:bg-gray-50">
+            <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-900">${
+              activity.date || "-"
+            }</td>
+            <td class="py-3 px-4 whitespace-nowrap text-sm text-gray-900">
+              <span class="px-2 py-1 rounded-full text-xs font-medium 
+                ${getActivityColor(activity.dailyActivity)}">
+                ${formatCategoryName(activity.dailyActivity)}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-sm text-gray-500">${getActivityDetails(
+              activity
+            )}</td>
+            <td class="py-3 px-4 whitespace-nowrap text-sm font-medium 
+              ${
+                activity.co2 > 5
+                  ? "text-red-600"
+                  : activity.co2 > 2
+                  ? "text-orange-600"
+                  : "text-green-600"
+              }">
+              ${(activity.co2 || 0).toFixed(2)} kg
+            </td>
+          </tr>
+        `
+          )
+          .join("");
+      }
+
+      function formatCategoryName(category) {
+        const names = {
+          carTravel: "Car Travel",
+          meatConsumption: "Meat",
+          electricityUse: "Electricity",
+          hotShower: "Hot Shower",
+          watchTV: "TV",
+          orderedIn: "Food Delivery",
+        };
+        return names[category] || category;
+      }
+
+      function getActivityColor(activity) {
+        const colors = {
+          carTravel: "bg-red-100 text-red-800",
+          meatConsumption: "bg-orange-100 text-orange-800",
+          electricityUse: "bg-blue-100 text-blue-800",
+          hotShower: "bg-green-100 text-green-800",
+          watchTV: "bg-purple-100 text-purple-800",
+          orderedIn: "bg-yellow-100 text-yellow-800",
+        };
+        return colors[activity] || "bg-gray-100 text-gray-800";
+      }
+
+      function getActivityDetails(activity) {
+        switch (activity.dailyActivity) {
+          case "carTravel":
+            return `${activity.distance || "?"} km • ${
+              activity.vehicleType || ""
+            } (${activity.fuelType || ""})`;
+          case "meatConsumption":
+            return `${activity.meatQuantity || "?"}g ${
+              activity.meatType || ""
+            }`;
+          case "electricityUse":
+            return `${activity.electricityUsage || "?"} kWh used`;
+          case "hotShower":
+            return `${activity.showerDuration || "?"} min • ${
+              activity.waterFlowRate || ""
+            } flow`;
+          case "watchTV":
+            return `${activity.tvDuration || "?"} hrs • ${
+              activity.tvType || ""
+            }`;
+          case "orderedIn":
+            return `${activity.foodType || ""} (${
+              activity.packagingType || ""
+            })`;
+          default:
+            return "No details";
+        }
+      }
+    </script>
+  </body>
+</html>
