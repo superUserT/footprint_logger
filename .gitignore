@@ -1,1 +1,7 @@
 node_modules/
+tsconfig.json
+tsconfig.tsbuildinfo
+src/dashboard_logic.ts
+src/dashboard_logic.js
+src/logger_logic.js
+src/logger_logic.ts

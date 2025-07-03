@@ -7,6 +7,7 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static("src"));
 app.use(express.static("public"));
 
 const DATA_FILE = path.join(__dirname, "data", "activities.json");

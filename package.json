@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/superUserT/footprint_logger#readme",
   "devDependencies": {
+    "@types/chart.js": "^2.9.41",
     "jasmine": "^5.8.0",
     "nodemon": "^3.1.10",
     "typescript": "^5.8.3"
