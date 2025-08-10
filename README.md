@@ -1,15 +1,23 @@
-# Real-World Build 1: Footprint Logger UI
+# Real-World Build 2: Footprint Logger with Accounts
 
-## Task
+## Scenario:
 
-### Build a front-end app using HTML, CSS, and JavaScript that allows users to:
+Due to user interest, you're now building a full-stack version of the Footprint Logger. This
+version should support user registration and login, allow users to save activity logs to their own
+accounts, and compare their footprint to a community average.
 
-- ● Select or input daily activities (e.g., car travel, meat consumption, electricity use)
-- ● Automatically assign a CO2 value to each activity
-- ● View a running total of emissions
-- ● Display a visual summary (e.g., a bar or pie chart)
-- ● Filter activities by category (e.g., food, transport, energy)
-- ● Use localStorage to save data between sessions
+## Your Task:
+
+Use Node.js, Express, and MongoDB to:
+● Build authentication routes (register, login)
+● Securely store and retrieve user-specific activity logs
+● Show a user dashboard with their logs and a total emissions summary
+● Calculate and display an average emission level across all users
+● Ensure there is a view for weekly summaries or streak tracking
+● Simple leaderboard of low-footprint users
+Submission Instructions:
+Please be sure to push your code to a public GitHub repository and submit the repo link on
+Google Classroom for grading.
 
 ## How ot run the project
 

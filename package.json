@@ -1,38 +1,27 @@
 {
   "name": "footprint_logger",
-  "version": "1.0.0",
-  "description": "A footprint logger",
-  "main": "index.html",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "jasmine",
-    "start": "nodemon server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/superUserT/footprint_logger.git"
-  },
-  "keywords": [
-    "node"
-  ],
-  "author": {
-    "name": "Thabiso Rantsho",
-    "email": "thabiso.rantsho@Umuzi.org",
-    "github": "https://github.com/superUserT"
-  },
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/superUserT/footprint_logger/issues"
-  },
-  "homepage": "https://github.com/superUserT/footprint_logger#readme",
-  "devDependencies": {
-    "@types/chart.js": "^2.9.41",
-    "jasmine": "^5.8.0",
-    "nodemon": "^3.1.10",
-    "typescript": "^5.8.3"
+    "start": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "lodash": "^4.17.21"
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^9.32.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.1.0"
   }
 }
