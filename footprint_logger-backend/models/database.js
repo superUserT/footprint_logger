@@ -42,9 +42,13 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
+// I need to get the logged in user's id
 const logSchema = new mongoose.Schema(
   {
+    id: {
+      type: Number,
+      required: true,
+    },
     date: {
       type: Date,
       required: true,
@@ -81,6 +85,8 @@ userSchema.pre("save", function (next) {
 userSchema.index({ email: 1 });
 userSchema.index({ username: 1 });
 
+logSchema.index({ id: 1 });
+
 // Instance method
 userSchema.methods.getUserInfo = function () {
   return {
@@ -90,11 +96,22 @@ userSchema.methods.getUserInfo = function () {
   };
 };
 
+logSchema.methods.getUserInfo = function () {
+  return {
+    id: this.id,
+    email: this.email,
+  };
+};
+
 // Static method
 userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email: email.toLowerCase() });
 };
 
+logSchema.statics.findbyId = function (id) {
+  return this.findOne({ id: id });
+};
 const User = mongoose.model("User", userSchema);
+const Log = mongoose.model("Log", logSchema);
 
-module.exports = { User };
+module.exports = { User, Log };

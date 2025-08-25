@@ -1,7 +1,7 @@
 const express = require("express");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const connectToDatabase = require("../models/db");
+const connectDB = require("../models/database.js");
 const router = express.Router();
 const dotenv = require("dotenv");
 const pino = require("pino"); // Import Pino logger
@@ -18,7 +18,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 router.post("/register", async (req, res) => {
   try {
     //Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`.
-    const db = await connectToDatabase();
+    const db = await connectDB();
     const collection = db.collection("users");
     const existingEmail = await collection.findOne({ email: req.body.email });
 
@@ -59,7 +59,7 @@ router.post("/login", async (req, res) => {
 
   try {
     // const collection = await connectToDatabase();
-    const db = await connectToDatabase();
+    const db = await connectDB();
     const collection = db.collection("users");
     const theUser = await collection.findOne({ email: req.body.email });
 
@@ -114,7 +114,7 @@ router.put("/update", async (req, res) => {
     }
 
     //Task 4: Connect to MongoDB
-    const db = await connectToDatabase();
+    const db = await connectDB();
     const collection = db.collection("users");
 
     //Task 5: Find user credentials

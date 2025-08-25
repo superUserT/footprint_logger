@@ -15,4 +15,8 @@ const errorMessages = {
   notAdmin: "You are not an admin",
 };
 
+const misc = {
+  server: "Inside the server",
+};
+
 module.exports = { authMessages, errorMessages };
