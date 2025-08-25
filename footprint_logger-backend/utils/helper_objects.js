@@ -7,6 +7,12 @@ const authMessages = {
   userNotFound: "User not found",
   updateApiError: "Validation errors in update request",
   emailNotInHeader: "Email not found in the request headers",
+  userUpdateSuccess: "User updated successfully",
 };
 
-module.exports = { authMessages };
+const errorMessages = {
+  cannotConnectToDB: "Cannot connect to database",
+  notAdmin: "You are not an admin",
+};
+
+module.exports = { authMessages, errorMessages };
