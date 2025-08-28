@@ -19,4 +19,4 @@ const misc = {
   server: "Inside the server",
 };
 
-module.exports = { authMessages, errorMessages };
+module.exports = { authMessages, errorMessages, misc };

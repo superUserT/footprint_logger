@@ -45,7 +45,13 @@ const userSchema = new mongoose.Schema(
 // I need to get the logged in user's id
 const logSchema = new mongoose.Schema(
   {
-    id: {
+    userId: {
+      // Changed from 'id' to 'userId'
+      type: mongoose.Schema.Types.ObjectId, // Reference to User model
+      ref: "User",
+      required: true,
+    },
+    logId: {
       type: Number,
       required: true,
     },
@@ -60,14 +66,6 @@ const logSchema = new mongoose.Schema(
     co2Saved: {
       type: Number,
       required: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
     },
   },
   {

@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const { connectDB } = require("./config/mongoDbConfig.js");
 const { User, Log } = require("./models/database.js");
@@ -43,6 +42,34 @@ app.use((err, req, res, next) => {
 
 app.get("/", (req, res) => {
   res.send(misc.server);
+});
+
+app.get("/testdb", async (req, res) => {
+  try {
+    // Test creating a user
+    const testUser = new User({
+      username: "testuser",
+      email: "test@example.com",
+      password: "testpass123",
+    });
+
+    await testUser.save();
+
+    // Test creating a log
+    const testLog = new Log({
+      id: 1,
+      logId: 1,
+      date: new Date(),
+      activity: "Walking",
+      co2Saved: 2.5,
+    });
+
+    await testLog.save();
+
+    res.json({ message: "Database connection and models working!" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.listen(PORT, () => {
