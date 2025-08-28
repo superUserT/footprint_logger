@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
-const session = require("express-session");
-const passport = require("passport");
+// const session = require("express-session");
+// const passport = require("passport");
 const crypto = require("crypto");
 require("dotenv").config();
 const { errorMessages } = require("../utils/helper_objects.js");
@@ -16,21 +16,21 @@ app.use(express.static("src"));
 app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "src")));
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false,
-      httpOnly: true,
-      sameSite: "lax",
-    },
-  })
-);
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: false,
+//       httpOnly: true,
+//       sameSite: "lax",
+//     },
+//   })
+// );
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use((_req, res, next) => {
   const nonce = crypto.randomBytes(16).toString("hex");
@@ -58,32 +58,32 @@ app.use((_req, res, next) => {
   next();
 });
 // need to work on this
-const isAuthenticated = (req, res, next) => {
-  if (req.session.user) {
-    next();
-  } else {
-    res.redirect("/login");
-  }
-};
+// const isAuthenticated = (req, res, next) => {
+//   if (req.session.user) {
+//     next();
+//   } else {
+//     res.redirect("/login");
+//   }
+// };
 
-const isAdmin = (req, res, next) => {
-  const allowedEmails = [
-    "rantshothabisomail@gmail.com",
-    "alanwattscodes@gmail.com",
-  ];
-  const userEmail =
-    req.session.email || req.session.user?.email || req.user?.email;
+// const isAdmin = (req, res, next) => {
+//   const allowedEmails = [
+//     "rantshothabisomail@gmail.com",
+//     "alanwattscodes@gmail.com",
+//   ];
+//   const userEmail =
+//     req.session.email || req.session.user?.email || req.user?.email;
 
-  if (
-    req.session.user &&
-    userEmail &&
-    allowedEmails.includes(userEmail.toLowerCase())
-  ) {
-    next();
-  } else {
-    res.status(403).send(errorMessages.notAdmin);
-  }
-};
+//   if (
+//     req.session.user &&
+//     userEmail &&
+//     allowedEmails.includes(userEmail.toLowerCase())
+//   ) {
+//     next();
+//   } else {
+//     res.status(403).send(errorMessages.notAdmin);
+//   }
+// };
 
 /**
  * Routes that need to be implemented for footprint logger

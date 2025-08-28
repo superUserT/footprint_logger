@@ -82,8 +82,8 @@ userSchema.pre("save", function (next) {
 });
 
 // Create indexes for better performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
+// userSchema.index({ email: 1 });
+// userSchema.index({ username: 1 });
 
 logSchema.index({ id: 1 });
 
