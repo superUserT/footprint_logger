@@ -8,11 +8,13 @@ const authMessages = {
   updateApiError: "Validation errors in update request",
   emailNotInHeader: "Email not found in the request headers",
   userUpdateSuccess: "User updated successfully",
+  DatabaseConnected: "Database succesfully connected",
 };
 
 const errorMessages = {
   cannotConnectToDB: "Cannot connect to database",
   notAdmin: "You are not an admin",
+  ConnectionError: "Database connection error:",
 };
 
 const misc = {

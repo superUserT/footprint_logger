@@ -2,7 +2,7 @@ const express = require("express");
 const { connectDB } = require("./config/mongoDbConfig.js");
 const { User, Log } = require("./models/database.js");
 const cors = require("cors");
-const pinoLogger = require("./footprint_loggger.js");
+const { logger } = require("./footprint_loggger.js");
 const pinoHttp = require("pino-http");
 const {
   errorMessages,
@@ -16,13 +16,13 @@ const PORT = process.env.PORT || 3000;
 // Connect to database
 connectDB()
   .then(() => {
-    pinoLogger.info("Connected to DB");
+    logger.info("Connected to DB");
   })
   .catch((error) => console.error("Failed to connect to DB", error));
 
 // Middleware
 app.use(express.json());
-app.use(pinoHttp({ pinoLogger }));
+app.use(pinoHttp({ pinoLogger: logger }));
 
 // Route files
 const footprintLoggerRoutes = require("./routes/footprintLoggerRoutes.js");

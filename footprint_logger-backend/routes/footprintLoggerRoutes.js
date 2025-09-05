@@ -5,7 +5,8 @@ const path = require("path");
 const crypto = require("crypto");
 require("dotenv").config();
 const { errorMessages } = require("../utils/helper_objects.js");
-
+const { Log, User } = require("../models/database.js");
+const { model } = require("mongoose");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -97,7 +98,7 @@ app.use((_req, res, next) => {
  *
  * DASHBOARD:
  * get all logs: specify data
- *
+
  *
  * AVERAGES:
  * Get all logs and do the calculations
@@ -155,3 +156,51 @@ app.post("/", async (req, res, next) => {
     next(e);
   }
 });
+
+// Get leaderboard
+app.get("/leaderboard", async (req, res) => {
+  try {
+    const leaderboard = await User.getLeaderboard();
+    res.json(leaderboard);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get total CO2 saved
+app.get("/total-co2", async (req, res) => {
+  try {
+    const totalCO2 = await User.getTotalCO2();
+    res.json(totalCO2);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user-specific CO2 data
+app.get("/user/:userId/co2", async (req, res) => {
+  try {
+    const userCO2 = await User.getUserTotalCO2(req.params.userId);
+    if (!userCO2) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(userCO2);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user log statistics
+app.get("/user/:userId/log-stats", async (req, res) => {
+  try {
+    const stats = await Log.getUserLogStats(req.params.userId);
+    if (!stats) {
+      return res.status(404).json({ error: "No logs found for this user" });
+    }
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = { app };
