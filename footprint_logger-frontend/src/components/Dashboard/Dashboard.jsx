@@ -1,5 +1,5 @@
 // components/Dashboard.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Grid,
@@ -8,6 +8,7 @@ import {
   Box,
   Card,
   CardContent,
+  CircularProgress,
 } from "@mui/material";
 import {
   TrendingDown,
@@ -17,15 +18,60 @@ import {
 import WeeklyGoal from "../WeeklyGoalsPage/WeeklyGoal";
 import SubmitLog from "../SubmitPage/SubmitLog";
 import Notification from "../Notifications/Notification";
-import { useAuth } from "../../context/AuthContext"; // ✅ Added import
+import { useAuth } from "../../context/AuthContext";
+import axios from "axios";
 
-const Dashboard = ({ logs, setLogs }) => {
-  const { user } = useAuth(); // ✅ Get user from AuthContext
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-  const totalCo2Saved = logs.reduce((total, log) => total + log.co2Saved, 0);
-  const communityAverage = 12.5; // kg CO2 saved
+const Dashboard = () => {
+  const { user } = useAuth();
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalCo2Saved: 0,
+    activityCount: 0,
+    averageCo2PerActivity: 0
+  });
 
-  const stats = [
+  useEffect(() => {
+    fetchUserLogs();
+    fetchUserStats();
+  }, []);
+
+  const fetchUserLogs = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get(`${API_BASE_URL}/api/logs`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setLogs(response.data);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserStats = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get(`${API_BASE_URL}/api/logs/user/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setStats(response.data);
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
+
+  const totalCo2Saved = stats.totalCo2Saved || 0;
+  const communityAverage = 12.5;
+
+  const statCards = [
     {
       title: "Total CO₂ Saved",
       value: `${totalCo2Saved.toFixed(1)} kg`,
@@ -34,7 +80,7 @@ const Dashboard = ({ logs, setLogs }) => {
     },
     {
       title: "Activities Logged",
-      value: logs.length,
+      value: stats.activityCount || 0,
       icon: <EmojiTransportation sx={{ fontSize: 40 }} />,
       color: "#1565C0",
     },
@@ -51,6 +97,14 @@ const Dashboard = ({ logs, setLogs }) => {
     },
   ];
 
+  if (loading) {
+    return (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+          <CircularProgress />
+        </Box>
+    );
+  }
+
   return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
@@ -61,7 +115,7 @@ const Dashboard = ({ logs, setLogs }) => {
 
         <Grid container spacing={3}>
           {/* Stats Cards */}
-          {stats.map((stat, index) => (
+          {statCards.map((stat, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
                 <Card elevation={3}>
                   <CardContent>
@@ -84,14 +138,14 @@ const Dashboard = ({ logs, setLogs }) => {
           {/* Weekly Goal */}
           <Grid item xs={12} md={6}>
             <Paper elevation={3} sx={{ p: 2 }}>
-              <WeeklyGoal user={user} />
+              <WeeklyGoal />
             </Paper>
           </Grid>
 
           {/* Submit Log */}
           <Grid item xs={12} md={6}>
             <Paper elevation={3} sx={{ p: 2 }}>
-              <SubmitLog logs={logs} setLogs={setLogs} />
+              <SubmitLog onLogAdded={fetchUserLogs} />
             </Paper>
           </Grid>
 
@@ -105,7 +159,7 @@ const Dashboard = ({ logs, setLogs }) => {
                   <Box>
                     {logs.map((log) => (
                         <Box
-                            key={log.id}
+                            key={log._id}
                             sx={{
                               display: "flex",
                               justifyContent: "space-between",
@@ -128,8 +182,7 @@ const Dashboard = ({ logs, setLogs }) => {
                   </Box>
               ) : (
                   <Typography variant="body2" color="text.secondary">
-                    No activities logged yet. Start by submitting your first
-                    activity!
+                    No activities logged yet. Start by submitting your first activity!
                   </Typography>
               )}
             </Paper>

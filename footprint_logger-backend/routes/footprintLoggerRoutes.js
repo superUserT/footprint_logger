@@ -1,164 +1,167 @@
+// footprintLoggerRoutes.js
 const express = require("express");
-const path = require("path");
-// const session = require("express-session");
-// const passport = require("passport");
-const crypto = require("crypto");
-require("dotenv").config();
-const { errorMessages } = require("../utils/helper_objects.js");
 const { Log, User } = require("../models/database.js");
-const { model } = require("mongoose");
-const app = express();
-const port = process.env.PORT || 3000;
+const { logger } = require("../footprint_loggger.js");
+const { errorMessages } = require("../utils/helper_objects.js");
+const router = express.Router();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware to verify JWT token
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-app.use(express.static("src"));
-app.use(express.static("public"));
-app.use(express.static(path.join(__dirname, "src")));
+  if (!token) {
+    return res.status(401).json({ error: "Access token required" });
+  }
 
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//       secure: false,
-//       httpOnly: true,
-//       sameSite: "lax",
-//     },
-//   })
-// );
-
-// app.use(passport.initialize());
-// app.use(passport.session());
-
-app.use((_req, res, next) => {
-  const nonce = crypto.randomBytes(16).toString("hex");
-  res.locals.nonce = nonce;
-
-  res.setHeader(
-    "Content-Security-Policy",
-    [
-      `script-src 'nonce-${nonce}' 'self' https://cdn.jsdelivr.net https://code.jquery.com`,
-      "default-src 'self'",
-      "style-src 'self' https://cdn.jsdelivr.net",
-      "img-src 'self' data: https://ghchart.rshah.org http://ghchart.rshah.org",
-      "connect-src 'self' https://accounts.google.com",
-      "font-src 'self'",
-      "frame-src 'none'",
-      "object-src 'none'",
-      "connect-src 'self' https://accounts.google.com http://localhost:* http://localhost:3000",
-    ].join("; ")
-  );
-
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "SAMEORIGIN");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-
-  next();
-});
-// need to work on this
-// const isAuthenticated = (req, res, next) => {
-//   if (req.session.user) {
-//     next();
-//   } else {
-//     res.redirect("/login");
-//   }
-// };
-
-// const isAdmin = (req, res, next) => {
-//   const allowedEmails = [
-//     "rantshothabisomail@gmail.com",
-//     "alanwattscodes@gmail.com",
-//   ];
-//   const userEmail =
-//     req.session.email || req.session.user?.email || req.user?.email;
-
-//   if (
-//     req.session.user &&
-//     userEmail &&
-//     allowedEmails.includes(userEmail.toLowerCase())
-//   ) {
-//     next();
-//   } else {
-//     res.status(403).send(errorMessages.notAdmin);
-//   }
-// };
-
-/**
- * Routes that need to be implemented for footprint logger
- *
- * LOGS:
- * Get all logs
- * Get a single log
- * post a log
- * update a log
- * delete a log
- *
- * DASHBOARD:
- * get all logs: specify data
-
- *
- * AVERAGES:
- * Get all logs and do the calculations
- *
- *
- * Weekly:
- * weekly summaries or streak tracking
- *
- *
- * LEADERBOARD:
- * Simple leaderboard of low-footprint users
- * **/
-
-app.get("/", async (req, res, next) => {
-  logger.info("/ called");
   try {
-    const db = await connectToDatabase();
-
-    const collection = db.collection("footprintLogs");
-    const footprintLogs = await collection.find({}).toArray();
-    res.json();
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded.user;
+    next();
   } catch (error) {
-    logger.console.error(errorMessages.cannotConnectToDB);
-    next(error);
+    return res.status(403).json({ error: "Invalid or expired token" });
+  }
+};
+
+// Get all logs for authenticated user
+router.get("/", authenticateToken, async (req, res) => {
+  try {
+    const logs = await Log.find({ userId: req.user.id }).sort({ date: -1 });
+    res.json(logs);
+  } catch (error) {
+    logger.error("Error fetching logs:", error);
+    res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
 
-// Get a single gift by ID
-app.get("/:id", async (req, res, next) => {
+// Get a single log by ID
+router.get("/:id", authenticateToken, async (req, res) => {
   try {
-    const db = await connectToDatabase();
-    const collection = db.collection("gifts");
-    const id = req.params.id;
-    const gift = await collection.findOne({ id: id });
+    const log = await Log.findOne({
+      _id: req.params.id,
+      userId: req.user.id
+    });
 
-    if (!gift) {
-      return res.status(404).send("Gift not found");
+    if (!log) {
+      return res.status(404).json({ error: "Log not found" });
     }
 
-    res.json(gift);
+    res.json(log);
   } catch (error) {
-    next(error);
+    logger.error("Error fetching log:", error);
+    res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
 
-// Add a new gift
-app.post("/", async (req, res, next) => {
+// Create a new log
+router.post("/", authenticateToken, async (req, res) => {
   try {
-    const db = await connectToDatabase();
-    const collection = db.collection("gifts");
-    const gift = await collection.insertOne(req.body);
+    const { date, activity, co2Saved, details } = req.body;
 
-    res.status(201).json(gift.ops[0]);
-  } catch (e) {
-    next(e);
+    // Get the next logId for this user
+    const lastLog = await Log.findOne({ userId: req.user.id })
+        .sort({ logId: -1 })
+        .limit(1);
+
+    const nextLogId = lastLog ? lastLog.logId + 1 : 1;
+
+    const newLog = new Log({
+      userId: req.user.id,
+      logId: nextLogId,
+      date: new Date(date),
+      activity,
+      co2Saved: parseFloat(co2Saved),
+      details
+    });
+
+    const savedLog = await newLog.save();
+    logger.info(`New log created for user ${req.user.id}`);
+
+    res.status(201).json(savedLog);
+  } catch (error) {
+    logger.error("Error creating log:", error);
+    res.status(500).json({ error: errorMessages.internalServerError });
+  }
+});
+
+// Update a log
+router.put("/:id", authenticateToken, async (req, res) => {
+  try {
+    const { date, activity, co2Saved, details } = req.body;
+
+    const updatedLog = await Log.findOneAndUpdate(
+        { _id: req.params.id, userId: req.user.id },
+        {
+          date: new Date(date),
+          activity,
+          co2Saved: parseFloat(co2Saved),
+          details,
+          updatedAt: new Date()
+        },
+        { new: true, runValidators: true }
+    );
+
+    if (!updatedLog) {
+      return res.status(404).json({ error: "Log not found" });
+    }
+
+    res.json(updatedLog);
+  } catch (error) {
+    logger.error("Error updating log:", error);
+    res.status(500).json({ error: errorMessages.internalServerError });
+  }
+});
+
+// Delete a log
+router.delete("/:id", authenticateToken, async (req, res) => {
+  try {
+    const deletedLog = await Log.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.id
+    });
+
+    if (!deletedLog) {
+      return res.status(404).json({ error: "Log not found" });
+    }
+
+    res.json({ message: "Log deleted successfully" });
+  } catch (error) {
+    logger.error("Error deleting log:", error);
+    res.status(500).json({ error: errorMessages.internalServerError });
+  }
+});
+
+// Get user log statistics
+router.get("/user/stats", authenticateToken, async (req, res) => {
+  try {
+    const stats = await Log.aggregate([
+      { $match: { userId: req.user.id } },
+      {
+        $group: {
+          _id: "$userId",
+          totalCo2Saved: { $sum: "$co2Saved" },
+          activityCount: { $sum: 1 },
+          averageCo2PerActivity: { $avg: "$co2Saved" },
+        },
+      },
+    ]);
+
+    const result = stats.length > 0 ? stats[0] : {
+      totalCo2Saved: 0,
+      activityCount: 0,
+      averageCo2PerActivity: 0
+    };
+
+    res.json(result);
+  } catch (error) {
+    logger.error("Error getting user stats:", error);
+    res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
 
 // Get leaderboard
-app.get("/leaderboard", async (req, res) => {
+router.get("/leaderboard/global", async (req, res) => {
   try {
     const leaderboard = await User.getLeaderboard();
     res.json(leaderboard);
@@ -168,7 +171,7 @@ app.get("/leaderboard", async (req, res) => {
 });
 
 // Get total CO2 saved
-app.get("/total-co2", async (req, res) => {
+router.get("/stats/total-co2", async (req, res) => {
   try {
     const totalCO2 = await User.getTotalCO2();
     res.json(totalCO2);
@@ -177,30 +180,4 @@ app.get("/total-co2", async (req, res) => {
   }
 });
 
-// Get user-specific CO2 data
-app.get("/user/:userId/co2", async (req, res) => {
-  try {
-    const userCO2 = await User.getUserTotalCO2(req.params.userId);
-    if (!userCO2) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    res.json(userCO2);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Get user log statistics
-app.get("/user/:userId/log-stats", async (req, res) => {
-  try {
-    const stats = await Log.getUserLogStats(req.params.userId);
-    if (!stats) {
-      return res.status(404).json({ error: "No logs found for this user" });
-    }
-    res.json(stats);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-module.exports = { app };
+module.exports = router;

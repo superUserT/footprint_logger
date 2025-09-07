@@ -1,3 +1,4 @@
+// server.js
 const express = require("express");
 const { connectDB } = require("./config/mongoDbConfig.js");
 const { User, Log } = require("./models/database.js");
@@ -15,10 +16,10 @@ const PORT = process.env.PORT || 3001;
 
 // Connect to database
 connectDB()
-  .then(() => {
-    logger.info("Connected to DB");
-  })
-  .catch((error) => console.error("Failed to connect to DB", error));
+    .then(() => {
+      logger.info("Connected to DB");
+    })
+    .catch((error) => console.error("Failed to connect to DB", error));
 
 // CORS configuration - Allow requests from multiple origins
 const allowedOrigins = [
@@ -28,20 +29,20 @@ const allowedOrigins = [
 ].filter(Boolean); // Remove any undefined values
 
 app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, Postman, etc.)
-      if (!origin) return callback(null, true);
+    cors({
+      origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
 
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    credentials: true,
-  })
+        if (allowedOrigins.indexOf(origin) === -1) {
+          const msg =
+              "The CORS policy for this site does not allow access from the specified Origin.";
+          return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+      },
+      credentials: true,
+    })
 );
 
 // Middleware
@@ -55,6 +56,7 @@ const authRoutes = require("./routes/authRoutes.js");
 
 // Use Routes - Make sure auth routes are mounted correctly
 app.use("/api/auth", authRoutes);
+app.use("/api/logs", footprintLoggerRoutes); // ✅ Add this line
 
 // Global Error Handler
 app.use((err, req, res, next) => {
@@ -79,7 +81,7 @@ app.get("/testdb", async (req, res) => {
 
     // Test creating a log
     const testLog = new Log({
-      id: 1,
+      userId: testUser._id,
       logId: 1,
       date: new Date(),
       activity: "Walking",
