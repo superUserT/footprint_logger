@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { Login as LoginIcon } from "@mui/icons-material";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext"; // ✅ Add this import
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
@@ -23,9 +24,10 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ Get the login function from AuthContext
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError("");
     setLoading(true);
 
@@ -36,14 +38,18 @@ const Login = () => {
       });
 
       if (response.status === 200) {
+        // Login successful
         const { authtoken, userName, userEmail } = response.data;
 
-        // Store token and user info in localStorage or context
+        // ✅ Call the AuthContext login method to update React state
+        login(authtoken, userName, userEmail);
+
+        // ✅ Also store in localStorage (redundant but safe - AuthContext already does this)
         localStorage.setItem("authToken", authtoken);
         localStorage.setItem("userName", userName);
         localStorage.setItem("userEmail", userEmail);
 
-        navigate("/dashboard");
+        navigate("/homepage");
       }
     } catch (error) {
       if (error.response) {

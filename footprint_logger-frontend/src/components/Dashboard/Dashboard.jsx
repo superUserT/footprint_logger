@@ -12,14 +12,16 @@ import {
 import {
   TrendingDown,
   EmojiTransportation,
-  // Eco,
   CompareArrows,
 } from "@mui/icons-material";
 import WeeklyGoal from "../WeeklyGoalsPage/WeeklyGoal";
 import SubmitLog from "../SubmitPage/SubmitLog";
 import Notification from "../Notifications/Notification";
+import { useAuth } from "../../context/AuthContext"; // ✅ Added import
 
-const Dashboard = ({ user, logs, setLogs }) => {
+const Dashboard = ({ logs, setLogs }) => {
+  const { user } = useAuth(); // ✅ Get user from AuthContext
+
   const totalCo2Saved = logs.reduce((total, log) => total + log.co2Saved, 0);
   const communityAverage = 12.5; // kg CO2 saved
 
@@ -39,7 +41,6 @@ const Dashboard = ({ user, logs, setLogs }) => {
     {
       title: "Current Streak",
       value: "3 days",
-      // icon: <Eco sx={{ fontSize: 40 }} />,
       color: "#FF8F00",
     },
     {
@@ -51,90 +52,90 @@ const Dashboard = ({ user, logs, setLogs }) => {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Welcome back, {user.name}!
-      </Typography>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Welcome back, {user?.name}!
+        </Typography>
 
-      <Notification />
+        <Notification />
 
-      <Grid container spacing={3}>
-        {/* Stats Cards */}
-        {stats.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card elevation={3}>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Box sx={{ color: stat.color, mr: 2 }}>{stat.icon}</Box>
-                  <Box>
-                    <Typography variant="h6" component="div">
-                      {stat.value}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {stat.title}
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-
-        {/* Weekly Goal */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <WeeklyGoal user={user} />
-          </Paper>
-        </Grid>
-
-        {/* Submit Log */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <SubmitLog logs={logs} setLogs={setLogs} />
-          </Paper>
-        </Grid>
-
-        {/* Recent Activities */}
-        <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Recent Activities
-            </Typography>
-            {logs.length > 0 ? (
-              <Box>
-                {logs.map((log) => (
-                  <Box
-                    key={log.id}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      py: 1,
-                      borderBottom: "1px solid",
-                      borderColor: "divider",
-                    }}
-                  >
-                    <Box>
-                      <Typography variant="body1">{log.activity}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {new Date(log.date).toLocaleDateString()}
-                      </Typography>
+        <Grid container spacing={3}>
+          {/* Stats Cards */}
+          {stats.map((stat, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Card elevation={3}>
+                  <CardContent>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Box sx={{ color: stat.color, mr: 2 }}>{stat.icon}</Box>
+                      <Box>
+                        <Typography variant="h6" component="div">
+                          {stat.value}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {stat.title}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Typography variant="body1" color="primary.main">
-                      +{log.co2Saved} kg CO₂ saved
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                No activities logged yet. Start by submitting your first
-                activity!
+                  </CardContent>
+                </Card>
+              </Grid>
+          ))}
+
+          {/* Weekly Goal */}
+          <Grid item xs={12} md={6}>
+            <Paper elevation={3} sx={{ p: 2 }}>
+              <WeeklyGoal user={user} />
+            </Paper>
+          </Grid>
+
+          {/* Submit Log */}
+          <Grid item xs={12} md={6}>
+            <Paper elevation={3} sx={{ p: 2 }}>
+              <SubmitLog logs={logs} setLogs={setLogs} />
+            </Paper>
+          </Grid>
+
+          {/* Recent Activities */}
+          <Grid item xs={12}>
+            <Paper elevation={3} sx={{ p: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                Recent Activities
               </Typography>
-            )}
-          </Paper>
+              {logs.length > 0 ? (
+                  <Box>
+                    {logs.map((log) => (
+                        <Box
+                            key={log.id}
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              py: 1,
+                              borderBottom: "1px solid",
+                              borderColor: "divider",
+                            }}
+                        >
+                          <Box>
+                            <Typography variant="body1">{log.activity}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {new Date(log.date).toLocaleDateString()}
+                            </Typography>
+                          </Box>
+                          <Typography variant="body1" color="primary.main">
+                            +{log.co2Saved} kg CO₂ saved
+                          </Typography>
+                        </Box>
+                    ))}
+                  </Box>
+              ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    No activities logged yet. Start by submitting your first
+                    activity!
+                  </Typography>
+              )}
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
   );
 };
 

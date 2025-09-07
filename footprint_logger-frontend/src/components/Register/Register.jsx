@@ -24,12 +24,14 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -52,13 +54,12 @@ const Register = () => {
       });
 
       if (response.status === 200) {
-        const { authtoken, email: userEmail } = response.data;
+        setSuccess("Account created successfully! Redirecting to login...");
 
-        // Store token and user info
-        localStorage.setItem("authToken", authtoken);
-        localStorage.setItem("userEmail", userEmail);
-
-        navigate("/dashboard");
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       }
     } catch (error) {
       if (error.response) {
@@ -106,6 +107,12 @@ const Register = () => {
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
+            </Alert>
+          )}
+
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {success}
             </Alert>
           )}
 

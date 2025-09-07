@@ -2,8 +2,15 @@
 import React, { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from "./components//Dashboard/Dashboard";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider } from "../src/context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoutes/ProtectedRoutes";
+import Dashboard from "./components/Dashboard/Dashboard";
 import Login from "./components/LoginPage/Login";
 import Homepage from "./components/MainPage/MainPage";
 import Profile from "./components/Profile/Profile";
@@ -38,13 +45,6 @@ const theme = createTheme({
 });
 
 function App() {
-  const [user] = useState({
-    id: 1,
-    name: "Demo User",
-    email: "demo@footprintlogger.com",
-    weeklyGoal: 50, // kg CO2 reduction goal
-  });
-
   const [logs, setLogs] = useState([
     { id: 1, date: "2023-06-01", activity: "Biked to work", co2Saved: 5.2 },
     { id: 2, date: "2023-06-02", activity: "Vegetarian meals", co2Saved: 3.7 },
@@ -52,28 +52,64 @@ function App() {
   ]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <div className="App">
-          <Navigation />
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/dashboard"
-              element={<Dashboard user={user} logs={logs} setLogs={setLogs} />}
-            />
-            <Route path="/profile" element={<Profile user={user} />} />
-            <Route
-              path="/submit-log"
-              element={<SubmitLog logs={logs} setLogs={setLogs} />}
-            />
-          </Routes>
-        </div>
-      </Router>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <Router>
+            <div className="App">
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+
+                {/* Redirect root to login */}
+                <Route path="/" element={<Navigate to="/login" replace />} />
+
+                {/* Protected Routes with Navigation */}
+                <Route
+                    path="/homepage"
+                    element={
+                      <ProtectedRoute>
+                        <Navigation />
+                        <Homepage />
+                      </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Navigation />
+                        <Dashboard logs={logs} setLogs={setLogs} /> {/* ✅ Removed user prop */}
+                      </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Navigation />
+                        <Profile /> {/* ✅ Removed user prop */}
+                      </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/submit-log"
+                    element={
+                      <ProtectedRoute>
+                        <Navigation />
+                        <SubmitLog logs={logs} setLogs={setLogs} />
+                      </ProtectedRoute>
+                    }
+                />
+
+                {/* Catch all - redirect to login */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </div>
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
   );
 }
 
