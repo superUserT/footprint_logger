@@ -12,16 +12,22 @@ import {
   Alert,
 } from "@mui/material";
 import { PersonAdd } from "@mui/icons-material";
+import axios from "axios";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 const Register = () => {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -30,10 +36,50 @@ const Register = () => {
       return;
     }
 
-    if (name && email && password) {
-      navigate("/dashboard");
-    } else {
+    if (!firstName || !lastName || !email || !password) {
       setError("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        const { authtoken, email: userEmail } = response.data;
+
+        // Store token and user info
+        localStorage.setItem("authToken", authtoken);
+        localStorage.setItem("userEmail", userEmail);
+
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error.response) {
+        // Server responded with error status
+        if (
+          error.response.status === 400 &&
+          error.response.data === "Email ID already exists"
+        ) {
+          setError("Email already exists. Please use a different email.");
+        } else {
+          setError(error.response.data.error || "Registration failed");
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        setError("Network error. Please try again.");
+      } else {
+        // Something else happened
+        setError("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,13 +114,26 @@ const Register = () => {
               margin="normal"
               required
               fullWidth
-              id="name"
-              label="Full Name"
-              name="name"
-              autoComplete="name"
+              id="firstName"
+              label="First Name"
+              name="firstName"
+              autoComplete="given-name"
               autoFocus
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              disabled={loading}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="lastName"
+              label="Last Name"
+              name="lastName"
+              autoComplete="family-name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              disabled={loading}
             />
             <TextField
               margin="normal"
@@ -86,6 +145,7 @@ const Register = () => {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
             <TextField
               margin="normal"
@@ -98,6 +158,7 @@ const Register = () => {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
             <TextField
               margin="normal"
@@ -109,14 +170,16 @@ const Register = () => {
               id="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={loading}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2, py: 1.5 }}
+              disabled={loading}
             >
-              Sign Up
+              {loading ? "Creating Account..." : "Sign Up"}
             </Button>
             <Box sx={{ textAlign: "center" }}>
               <MuiLink component={Link} to="/login" variant="body2">

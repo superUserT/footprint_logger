@@ -79,11 +79,6 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-// Create indexes for better performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-logSchema.index({ userId: 1 });
-
 // Instance method
 userSchema.methods.getUserInfo = function () {
   return {

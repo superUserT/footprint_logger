@@ -1,6 +1,7 @@
 {
   "name": "footprint_logger-backend",
   "version": "1.0.0",
+  "type": "commonjs",
   "description": "Backend Logic for footprint Logger",
   "main": "index.js",
   "scripts": {

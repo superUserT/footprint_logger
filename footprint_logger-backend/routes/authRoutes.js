@@ -1,73 +1,87 @@
 const express = require("express");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const connectDB = require("../models/database.js");
 const router = express.Router();
 const dotenv = require("dotenv");
-const pino = require("pino"); // Import Pino logger
+const pino = require("pino");
+const { User } = require("../models/database.js"); // Import the User model
 const { authMessages } = require("../utils/helper_objects.js");
+const {
+  registrationValidation,
+  loginValidation,
+} = require("../utils/helper_functions.js");
+const { validationResult } = require("express-validator");
 
-//Task 1: Use the `body`,`validationResult` from `express-validator` for input validation
-const { body, validationResult } = require("express-validator");
-
-const logger = pino(); // Create a Pino logger instance
+const logger = pino();
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-router.post("/register", async (req, res) => {
+router.post("/register", registrationValidation, async (req, res) => {
   try {
-    //Connect to `giftsdb` in MongoDB through `connectToDatabase` in `db.js`.
-    const db = await connectDB();
-    const collection = db.collection("users");
-    const existingEmail = await collection.findOne({ email: req.body.email });
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      logger.error("Validation errors during registration", errors.array());
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
 
-    if (existingEmail) {
+    // Use Mongoose model instead of raw MongoDB
+    const existingUser = await User.findByEmail(req.body.email);
+
+    if (existingUser) {
       logger.error(authMessages.emailIdExists);
-      return res.status(400).json(authMessages.emailIdExists);
+      return res.status(400).json({ error: authMessages.emailIdExists });
     }
 
     const salt = await bcryptjs.genSalt(10);
     const hash = await bcryptjs.hash(req.body.password, salt);
-    const email = req.body.email;
-    // console.log("email is", email);
-    const newUser = await collection.insertOne({
+
+    // Create new user using Mongoose model
+    const newUser = new User({
+      username: req.body.username || req.body.firstName, // Adjust based on your schema
       email: req.body.email,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       password: hash,
-      createdAt: new Date(),
     });
+
+    const savedUser = await newUser.save();
 
     const payload = {
       user: {
-        id: newUser.insertedId,
+        id: savedUser._id,
       },
     };
 
     const authtoken = jwt.sign(payload, JWT_SECRET);
     logger.info(authMessages.resistrationSuccess);
-    res.json({ authtoken, email });
+    res.json({ authtoken, email: req.body.email });
   } catch (e) {
     logger.error(e);
-    return res.status(500).send(authMessages.internalServerError);
+    return res.status(500).json({ error: authMessages.internalServerError });
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginValidation, async (req, res) => {
   console.log("\n\n Inside login");
 
   try {
-    // const collection = await connectToDatabase();
-    const db = await connectDB();
-    const collection = db.collection("users");
-    const theUser = await collection.findOne({ email: req.body.email });
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      logger.error("Validation errors during login", errors.array());
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
+    // Use Mongoose model instead of raw MongoDB
+    const theUser = await User.findByEmail(req.body.email);
 
     if (theUser) {
       let result = await bcryptjs.compare(req.body.password, theUser.password);
       if (!result) {
         logger.error(authMessages.passMismatch);
-        return res.status(404).json(authMessages.passMismatch);
+        return res.status(400).json({ error: authMessages.passMismatch });
       }
       let payload = {
         user: {
@@ -75,7 +89,7 @@ router.post("/login", async (req, res) => {
         },
       };
 
-      const userName = theUser.firstName;
+      const userName = theUser.firstName || theUser.username;
       const userEmail = theUser.email;
 
       const authtoken = jwt.sign(payload, JWT_SECRET);
@@ -83,7 +97,7 @@ router.post("/login", async (req, res) => {
       return res.status(200).json({ authtoken, userName, userEmail });
     } else {
       logger.error(authMessages.userNotFound);
-      return res.status(404).json(authMessages.userNotFound);
+      return res.status(404).json({ error: authMessages.userNotFound });
     }
   } catch (e) {
     logger.error(e);
@@ -93,13 +107,10 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// update API
+// Update API
 router.put("/update", async (req, res) => {
-  // Task 2: Validate the input using `validationResult` and return approiate message if there is an error.
-
   const errors = validationResult(req);
 
-  // Task 3: Check if `email` is present in the header and throw an appropriate error message if not present.
   if (!errors.isEmpty()) {
     logger.error(authMessages.updateApiError, errors.array());
     return res.status(400).json({ errors: errors.array() });
@@ -113,29 +124,20 @@ router.put("/update", async (req, res) => {
       return res.status(400).json({ error: authMessages.emailNotInHeader });
     }
 
-    //Task 4: Connect to MongoDB
-    const db = await connectDB();
-    const collection = db.collection("users");
-
-    //Task 5: Find user credentials
-    const existingUser = await collection.findOne({ email });
+    // Use Mongoose model instead of raw MongoDB
+    const existingUser = await User.findByEmail(email);
 
     if (!existingUser) {
       logger.error(authMessages.userNotFound);
       return res.status(404).json({ error: authMessages.userNotFound });
     }
 
+    // Update user using Mongoose
     existingUser.firstName = req.body.name;
     existingUser.updatedAt = new Date();
 
-    //Task 6: Update user credentials in DB
-    const updatedUser = await collection.findOneAndUpdate(
-      { email },
-      { $set: existingUser },
-      { returnDocument: "after" }
-    );
+    const updatedUser = await existingUser.save();
 
-    //Task 7: Create JWT authentication with user._id as payload using secret key from .env file
     const payload = {
       user: {
         id: updatedUser._id.toString(),
@@ -148,7 +150,8 @@ router.put("/update", async (req, res) => {
     res.json({ authtoken });
   } catch (error) {
     logger.error(error);
-    return res.status(500).send(authMessages.internalServerError);
+    return res.status(500).json({ error: authMessages.internalServerError });
   }
 });
+
 module.exports = router;

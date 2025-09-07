@@ -12,22 +12,52 @@ import {
   Alert,
 } from "@mui/material";
 import { Login as LoginIcon } from "@mui/icons-material";
+import axios from "axios";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    // For demo purposes, any non-empty credentials will work
-    if (email && password) {
-      navigate("/dashboard");
-    } else {
-      setError("Please enter both email and password");
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        const { authtoken, userName, userEmail } = response.data;
+
+        // Store token and user info in localStorage or context
+        localStorage.setItem("authToken", authtoken);
+        localStorage.setItem("userName", userName);
+        localStorage.setItem("userEmail", userEmail);
+
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error.response) {
+        // Server responded with error status
+        setError(error.response.data.error || "Login failed");
+      } else if (error.request) {
+        // Request was made but no response received
+        setError("Network error. Please try again.");
+      } else {
+        // Something else happened
+        setError("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +99,7 @@ const Login = () => {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
             <TextField
               margin="normal"
@@ -81,14 +112,16 @@ const Login = () => {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2, py: 1.5 }}
+              disabled={loading}
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </Button>
             <Box sx={{ textAlign: "center" }}>
               <MuiLink component={Link} to="/register" variant="body2">

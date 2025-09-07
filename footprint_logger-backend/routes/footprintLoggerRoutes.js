@@ -139,8 +139,8 @@ app.get("/:id", async (req, res, next) => {
     }
 
     res.json(gift);
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    next(error);
   }
 });
 

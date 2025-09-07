@@ -11,7 +11,7 @@ const {
 } = require("./utils/helper_objects.js");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Connect to database
 connectDB()
@@ -19,6 +19,30 @@ connectDB()
     logger.info("Connected to DB");
   })
   .catch((error) => console.error("Failed to connect to DB", error));
+
+// CORS configuration - Allow requests from multiple origins
+const allowedOrigins = [
+  "http://localhost:5173", // React/Vite default port
+  "http://localhost:3001", // Your backend port
+  process.env.FRONTEND_URL, // Environment variable if set
+].filter(Boolean); // Remove any undefined values
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+  })
+);
 
 // Middleware
 app.use(express.json());
@@ -29,10 +53,8 @@ const footprintLoggerRoutes = require("./routes/footprintLoggerRoutes.js");
 const authRoutes = require("./routes/authRoutes.js");
 // const queryRoutes = require("./routes/queryRoutes.js");
 
-// Use Routes : to change routes
-// app.use("/api/gifts", giftRoutes);
-// app.use("/api/auth", authRoutes);
-// app.use("/api/search", searchRoutes);
+// Use Routes - Make sure auth routes are mounted correctly
+app.use("/api/auth", authRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
@@ -75,3 +97,5 @@ app.get("/testdb", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = { app };
