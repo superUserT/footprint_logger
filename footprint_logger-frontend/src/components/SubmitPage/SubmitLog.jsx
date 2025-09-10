@@ -1,4 +1,3 @@
-// components/SubmitLog.js
 import React, { useState } from "react";
 import {
   Box,
@@ -15,7 +14,8 @@ import { Add } from "@mui/icons-material";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 const SubmitLog = () => {
   const [activity, setActivity] = useState("");
@@ -62,19 +62,19 @@ const SubmitLog = () => {
       const token = localStorage.getItem("authToken");
 
       const response = await axios.post(
-          `${API_BASE_URL}/api/logs`,
-          {
-            date,
-            activity,
-            co2Saved,
-            details
+        `${API_BASE_URL}/api/logs`,
+        {
+          date,
+          activity,
+          co2Saved,
+          details,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
+        }
       );
 
       if (response.status === 201) {
@@ -101,81 +101,79 @@ const SubmitLog = () => {
   };
 
   return (
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Log New Activity
-        </Typography>
+    <Box>
+      <Typography variant="h6" gutterBottom>
+        Log New Activity
+      </Typography>
 
-        {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              Activity logged successfully!
-            </Alert>
-        )}
+      {success && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          Activity logged successfully!
+        </Alert>
+      )}
 
-        {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-        )}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
-        <Box component="form" onSubmit={handleSubmit}>
-          {/* Activity Type */}
-          <TextField
-              select
-              fullWidth
-              label="Activity Type"
-              value={activity}
-              onChange={handleActivityChange}
-              margin="normal"
-              required
-          >
-            {activityTypes.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-            ))}
-          </TextField>
+      <Box component="form" onSubmit={handleSubmit}>
+        {/* Activity Type */}
+        <TextField
+          select
+          fullWidth
+          label="Activity Type"
+          value={activity}
+          onChange={handleActivityChange}
+          margin="normal"
+          required
+        >
+          {activityTypes.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
 
-          {/* ... (keep all the dynamic fields sections as they are) ... */}
+        {/* CO₂ Saved */}
+        <TextField
+          fullWidth
+          label="CO₂ Saved (kg)"
+          type="number"
+          value={co2Saved}
+          onChange={(e) => setCo2Saved(e.target.value)}
+          margin="normal"
+          inputProps={{ step: "0.1", min: "0" }}
+          required
+        />
 
-          {/* CO₂ Saved */}
-          <TextField
-              fullWidth
-              label="CO₂ Saved (kg)"
-              type="number"
-              value={co2Saved}
-              onChange={(e) => setCo2Saved(e.target.value)}
-              margin="normal"
-              inputProps={{ step: "0.1", min: "0" }}
-              required
-          />
+        {/* Date */}
+        <TextField
+          fullWidth
+          label="Date"
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          margin="normal"
+          required
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
 
-          {/* Date */}
-          <TextField
-              fullWidth
-              label="Date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              margin="normal"
-              required
-              InputLabelProps={{
-                shrink: true,
-              }}
-          />
-
-          <Button
-              type="submit"
-              variant="contained"
-              startIcon={<Add />}
-              fullWidth
-              sx={{ mt: 2 }}
-              disabled={loading}
-          >
-            {loading ? "Submitting..." : "Add Activity"}
-          </Button>
-        </Box>
+        <Button
+          type="submit"
+          variant="contained"
+          startIcon={<Add />}
+          fullWidth
+          sx={{ mt: 2 }}
+          disabled={loading}
+        >
+          {loading ? "Submitting..." : "Add Activity"}
+        </Button>
       </Box>
+    </Box>
   );
 };
 

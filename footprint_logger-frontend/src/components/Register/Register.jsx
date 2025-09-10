@@ -1,4 +1,3 @@
-// components/Register.js
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -56,14 +55,12 @@ const Register = () => {
       if (response.status === 200) {
         setSuccess("Account created successfully! Redirecting to login...");
 
-        // Redirect to login page after 2 seconds
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       }
     } catch (error) {
       if (error.response) {
-        // Server responded with error status
         if (
           error.response.status === 400 &&
           error.response.data === "Email ID already exists"
@@ -73,10 +70,8 @@ const Register = () => {
           setError(error.response.data.error || "Registration failed");
         }
       } else if (error.request) {
-        // Request was made but no response received
         setError("Network error. Please try again.");
       } else {
-        // Something else happened
         setError("An unexpected error occurred");
       }
     } finally {

@@ -3,7 +3,6 @@ const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const dotenv = require("dotenv");
-const pino = require("pino");
 const { User } = require("../models/database.js");
 const { authMessages } = require("../utils/helper_objects.js");
 const {
@@ -11,8 +10,7 @@ const {
   loginValidation,
 } = require("../utils/helper_functions.js");
 const { validationResult } = require("express-validator");
-
-const logger = pino();
+const { authLogger } = require("../footprint_loggger.js"); // Import auth-specific logger
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -21,14 +19,14 @@ router.post("/register", registrationValidation, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      logger.error("Validation errors during registration", errors.array());
+      authLogger.error("Validation errors during registration", errors.array());
       return res.status(400).json({ error: errors.array()[0].msg });
     }
 
     const existingUser = await User.findByEmail(req.body.email);
 
     if (existingUser) {
-      logger.error(authMessages.emailIdExists);
+      authLogger.error(authMessages.emailIdExists);
       return res.status(400).json({ error: authMessages.emailIdExists });
     }
 
@@ -52,21 +50,19 @@ router.post("/register", registrationValidation, async (req, res) => {
     };
 
     const authtoken = jwt.sign(payload, JWT_SECRET);
-    logger.info(authMessages.resistrationSuccess);
+    authLogger.info(authMessages.resistrationSuccess);
     res.json({ authtoken, email: req.body.email });
   } catch (e) {
-    logger.error(e);
+    authLogger.error(e);
     return res.status(500).json({ error: authMessages.internalServerError });
   }
 });
 
 router.post("/login", loginValidation, async (req, res) => {
-  console.log("\n\n Inside login");
-
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      logger.error("Validation errors during login", errors.array());
+      authLogger.error("Validation errors during login", errors.array());
       return res.status(400).json({ error: errors.array()[0].msg });
     }
 
@@ -75,7 +71,7 @@ router.post("/login", loginValidation, async (req, res) => {
     if (theUser) {
       let result = await bcryptjs.compare(req.body.password, theUser.password);
       if (!result) {
-        logger.error(authMessages.passMismatch);
+        authLogger.error(authMessages.passMismatch);
         return res.status(400).json({ error: authMessages.passMismatch });
       }
       let payload = {
@@ -88,25 +84,25 @@ router.post("/login", loginValidation, async (req, res) => {
       const userEmail = theUser.email;
 
       const authtoken = jwt.sign(payload, JWT_SECRET);
-      logger.info(authMessages.loginSuccess);
+      console.log(authMessages.loginSuccess);
       return res.status(200).json({ authtoken, userName, userEmail });
     } else {
-      logger.error(authMessages.userNotFound);
+      authLogger.error(authMessages.userNotFound);
       return res.status(404).json({ error: authMessages.userNotFound });
     }
   } catch (e) {
-    logger.error(e);
+    authLogger.error(e);
     return res
       .status(500)
       .json({ error: authMessages.internalServerError, details: e.message });
   }
 });
-//not gonna use this one yet or ever big dog
+
 router.put("/update", async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    logger.error(authMessages.updateApiError, errors.array());
+    authLogger.error(authMessages.updateApiError, errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
 
@@ -114,14 +110,14 @@ router.put("/update", async (req, res) => {
     const email = req.headers.email;
 
     if (!email) {
-      logger.error(authMessages.emailNotInHeader);
+      authLogger.error(authMessages.emailNotInHeader);
       return res.status(400).json({ error: authMessages.emailNotInHeader });
     }
 
     const existingUser = await User.findByEmail(email);
 
     if (!existingUser) {
-      logger.error(authMessages.userNotFound);
+      authLogger.error(authMessages.userNotFound);
       return res.status(404).json({ error: authMessages.userNotFound });
     }
 
@@ -137,11 +133,11 @@ router.put("/update", async (req, res) => {
     };
 
     const authtoken = jwt.sign(payload, JWT_SECRET);
-    logger.info(authMessages.userUpdateSuccess);
+    authLogger.info(authMessages.userUpdateSuccess);
 
     res.json({ authtoken });
   } catch (error) {
-    logger.error(error);
+    authLogger.error(error);
     return res.status(500).json({ error: authMessages.internalServerError });
   }
 });

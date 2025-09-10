@@ -1,4 +1,3 @@
-// components/Notification.js
 import React, { useState } from "react";
 import {
   IconButton,
@@ -15,7 +14,6 @@ import {
 import {
   Notifications as NotificationsIcon,
   CheckCircle as CheckCircleIcon,
-  // Eco as EcoIcon,
   TrendingUp as TrendingUpIcon,
 } from "@mui/icons-material";
 
@@ -40,7 +38,7 @@ const Notification = () => {
       id: 3,
       message: "New activity suggestions available",
       read: true,
-      // icon: <EcoIcon color="primary" />,
+
       time: "3 days ago",
     },
   ]);

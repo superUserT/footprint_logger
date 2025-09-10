@@ -1,4 +1,3 @@
-// components/Navigation.js
 import React, { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -21,7 +20,6 @@ import {
   Person as PersonIcon,
   Add as AddIcon,
   Home as HomeIcon,
-  //   Eco as EcoIcon,
 } from "@mui/icons-material";
 import Notification from "../Notifications/Notification";
 
@@ -144,7 +142,7 @@ const Navigation = () => {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
+          keepMounted: true,
         }}
         sx={{
           display: { xs: "block", md: "none" },

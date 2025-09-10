@@ -1,4 +1,3 @@
-// components/Homepage.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,7 +17,6 @@ const Homepage = () => {
 
   const features = [
     {
-      // icon: <Eco sx={{ fontSize: 40 }} />,
       title: "Track Your Carbon Footprint",
       description:
         "Log your daily activities and calculate your environmental impact.",

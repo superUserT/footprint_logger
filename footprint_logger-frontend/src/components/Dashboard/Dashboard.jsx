@@ -1,4 +1,3 @@
-// components/Dashboard.js
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -21,7 +20,8 @@ import Notification from "../Notifications/Notification";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -30,7 +30,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     totalCo2Saved: 0,
     activityCount: 0,
-    averageCo2PerActivity: 0
+    averageCo2PerActivity: 0,
   });
 
   useEffect(() => {
@@ -43,8 +43,8 @@ const Dashboard = () => {
       const token = localStorage.getItem("authToken");
       const response = await axios.get(`${API_BASE_URL}/api/logs`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setLogs(response.data);
     } catch (error) {
@@ -59,8 +59,8 @@ const Dashboard = () => {
       const token = localStorage.getItem("authToken");
       const response = await axios.get(`${API_BASE_URL}/api/logs/user/stats`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setStats(response.data);
     } catch (error) {
@@ -99,96 +99,102 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-          <CircularProgress />
-        </Box>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
+        <CircularProgress />
+      </Box>
     );
   }
 
   return (
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Welcome back, {user?.name}!
-        </Typography>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Welcome back, {user?.name}!
+      </Typography>
 
-        <Notification />
+      <Notification />
 
-        <Grid container spacing={3}>
-          {/* Stats Cards */}
-          {statCards.map((stat, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                <Card elevation={3}>
-                  <CardContent>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Box sx={{ color: stat.color, mr: 2 }}>{stat.icon}</Box>
-                      <Box>
-                        <Typography variant="h6" component="div">
-                          {stat.value}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {stat.title}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-          ))}
-
-          {/* Weekly Goal */}
-          <Grid item xs={12} md={6}>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <WeeklyGoal />
-            </Paper>
-          </Grid>
-
-          {/* Submit Log */}
-          <Grid item xs={12} md={6}>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <SubmitLog onLogAdded={fetchUserLogs} />
-            </Paper>
-          </Grid>
-
-          {/* Recent Activities */}
-          <Grid item xs={12}>
-            <Paper elevation={3} sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Recent Activities
-              </Typography>
-              {logs.length > 0 ? (
+      <Grid container spacing={3}>
+        {/* Stats Cards */}
+        {statCards.map((stat, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card elevation={3}>
+              <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Box sx={{ color: stat.color, mr: 2 }}>{stat.icon}</Box>
                   <Box>
-                    {logs.map((log) => (
-                        <Box
-                            key={log._id}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              py: 1,
-                              borderBottom: "1px solid",
-                              borderColor: "divider",
-                            }}
-                        >
-                          <Box>
-                            <Typography variant="body1">{log.activity}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {new Date(log.date).toLocaleDateString()}
-                            </Typography>
-                          </Box>
-                          <Typography variant="body1" color="primary.main">
-                            +{log.co2Saved} kg CO₂ saved
-                          </Typography>
-                        </Box>
-                    ))}
+                    <Typography variant="h6" component="div">
+                      {stat.value}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {stat.title}
+                    </Typography>
                   </Box>
-              ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    No activities logged yet. Start by submitting your first activity!
-                  </Typography>
-              )}
-            </Paper>
+                </Box>
+              </CardContent>
+            </Card>
           </Grid>
+        ))}
+
+        {/* Weekly Goal */}
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <WeeklyGoal />
+          </Paper>
         </Grid>
-      </Container>
+
+        {/* Submit Log */}
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <SubmitLog onLogAdded={fetchUserLogs} />
+          </Paper>
+        </Grid>
+
+        {/* Recent Activities */}
+        <Grid item xs={12}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Recent Activities
+            </Typography>
+            {logs.length > 0 ? (
+              <Box>
+                {logs.map((log) => (
+                  <Box
+                    key={log._id}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      py: 1,
+                      borderBottom: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="body1">{log.activity}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {new Date(log.date).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body1" color="primary.main">
+                      +{log.co2Saved} kg CO₂ saved
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No activities logged yet. Start by submitting your first
+                activity!
+              </Typography>
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 

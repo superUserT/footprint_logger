@@ -1,6 +1,6 @@
 const express = require("express");
 const { Log, User } = require("../models/database.js");
-const { logger } = require("../footprint_loggger.js");
+const { footprintLogger } = require("../footprint_loggger.js");
 const { errorMessages } = require("../utils/helper_objects.js");
 const router = express.Router();
 
@@ -25,9 +25,12 @@ const authenticateToken = (req, res, next) => {
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const logs = await Log.find({ userId: req.user.id }).sort({ date: -1 });
+    footprintLogger.debug(
+      `Fetched ${logs.length} logs for user ${req.user.id}`
+    );
     res.json(logs);
   } catch (error) {
-    logger.error("Error fetching logs:", error);
+    footprintLogger.error("Error fetching logs:", error);
     res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
@@ -40,12 +43,18 @@ router.get("/:id", authenticateToken, async (req, res) => {
     });
 
     if (!log) {
+      footprintLogger.warn(
+        `Log not found: ${req.params.id} for user ${req.user.id}`
+      );
       return res.status(404).json({ error: "Log not found" });
     }
 
+    footprintLogger.debug(
+      `Fetched log ${req.params.id} for user ${req.user.id}`
+    );
     res.json(log);
   } catch (error) {
-    logger.error("Error fetching log:", error);
+    footprintLogger.error("Error fetching log:", error);
     res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
@@ -70,11 +79,15 @@ router.post("/", authenticateToken, async (req, res) => {
     });
 
     const savedLog = await newLog.save();
-    logger.info(`New log created for user ${req.user.id}`);
+    footprintLogger.info(`New log created for user ${req.user.id}`, {
+      logId: savedLog.logId,
+      activity: savedLog.activity,
+      co2Saved: savedLog.co2Saved,
+    });
 
     res.status(201).json(savedLog);
   } catch (error) {
-    logger.error("Error creating log:", error);
+    footprintLogger.error("Error creating log:", error);
     res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
@@ -96,12 +109,20 @@ router.put("/:id", authenticateToken, async (req, res) => {
     );
 
     if (!updatedLog) {
+      footprintLogger.warn(
+        `Log not found for update: ${req.params.id} for user ${req.user.id}`
+      );
       return res.status(404).json({ error: "Log not found" });
     }
 
+    footprintLogger.info(`Log updated for user ${req.user.id}`, {
+      logId: updatedLog.logId,
+      activity: updatedLog.activity,
+    });
+
     res.json(updatedLog);
   } catch (error) {
-    logger.error("Error updating log:", error);
+    footprintLogger.error("Error updating log:", error);
     res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
@@ -114,12 +135,20 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     });
 
     if (!deletedLog) {
+      footprintLogger.warn(
+        `Log not found for deletion: ${req.params.id} for user ${req.user.id}`
+      );
       return res.status(404).json({ error: "Log not found" });
     }
 
+    footprintLogger.info(`Log deleted for user ${req.user.id}`, {
+      logId: deletedLog.logId,
+      activity: deletedLog.activity,
+    });
+
     res.json({ message: "Log deleted successfully" });
   } catch (error) {
-    logger.error("Error deleting log:", error);
+    footprintLogger.error("Error deleting log:", error);
     res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
@@ -147,9 +176,10 @@ router.get("/user/stats", authenticateToken, async (req, res) => {
             averageCo2PerActivity: 0,
           };
 
+    footprintLogger.debug(`Stats fetched for user ${req.user.id}`, result);
     res.json(result);
   } catch (error) {
-    logger.error("Error getting user stats:", error);
+    footprintLogger.error("Error getting user stats:", error);
     res.status(500).json({ error: errorMessages.internalServerError });
   }
 });
@@ -157,8 +187,10 @@ router.get("/user/stats", authenticateToken, async (req, res) => {
 router.get("/leaderboard/global", async (req, res) => {
   try {
     const leaderboard = await User.getLeaderboard();
+    footprintLogger.debug("Global leaderboard fetched");
     res.json(leaderboard);
   } catch (error) {
+    footprintLogger.error("Error fetching leaderboard:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -166,8 +198,10 @@ router.get("/leaderboard/global", async (req, res) => {
 router.get("/stats/total-co2", async (req, res) => {
   try {
     const totalCO2 = await User.getTotalCO2();
+    footprintLogger.debug("Total CO2 stats fetched");
     res.json(totalCO2);
   } catch (error) {
+    footprintLogger.error("Error fetching total CO2 stats:", error);
     res.status(500).json({ error: error.message });
   }
 });

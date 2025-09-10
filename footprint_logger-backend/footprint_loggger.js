@@ -3,60 +3,35 @@ const fs = require("fs");
 const path = require("path");
 
 const logsDir = path.join(__dirname, "Logs");
-try {
-  if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir, { recursive: true });
-  }
-} catch (error) {
-  console.error("Cannot create logs directory, using console only:", error);
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
 }
 
-const logFile = path.join(logsDir, "logs.json");
+const authLogFile = path.join(logsDir, "authRoutesLogs.json");
+const footprintLogFile = path.join(logsDir, "footprintLoggerRoutesLogs.json");
+const generalLogFile = path.join(logsDir, "generalLogs.json");
 
-let logger;
+const createLogger = (logFile) => {
+  return pino({
+    level: process.env.NODE_ENV !== "production" ? "debug" : "info",
+    transport: {
+      targets: [
+        {
+          target: "pino/file",
+          level: "info",
+          options: {
+            destination: logFile,
+            mkdir: true,
+          },
+        },
+      ],
+    },
+  });
+};
 
-try {
-  if (process.env.NODE_ENV !== "production") {
-    logger = pino({
-      level: "debug",
-      transport: {
-        targets: [
-          {
-            target: "pino-pretty",
-            level: "debug",
-            options: {},
-          },
-          {
-            target: "pino/file",
-            level: "debug",
-            options: {
-              destination: logFile,
-              mkdir: true,
-            },
-          },
-        ],
-      },
-    });
-  } else {
-    logger = pino({
-      level: "info",
-      transport: {
-        targets: [
-          {
-            target: "pino/file",
-            level: "info",
-            options: {
-              destination: logFile,
-              mkdir: true,
-            },
-          },
-        ],
-      },
-    });
-  }
-} catch (error) {
-  console.error("Logger initialization failed, using basic logger:", error);
-  logger = pino();
-}
-
-module.exports = { logger };
+module.exports = {
+  authLogger: createLogger(authLogFile),
+  footprintLogger: createLogger(footprintLogFile),
+  generalLogger: createLogger(generalLogFile),
+  logger: createLogger(generalLogFile),
+};
