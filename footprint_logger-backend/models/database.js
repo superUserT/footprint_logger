@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// Your existing schemas
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -73,13 +72,11 @@ const logSchema = new mongoose.Schema(
   }
 );
 
-// Update the updatedAt field before saving
 userSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-// Instance method
 userSchema.methods.getUserInfo = function () {
   return {
     username: this.username,
@@ -88,18 +85,16 @@ userSchema.methods.getUserInfo = function () {
   };
 };
 
-// Static method
 userSchema.statics.findByEmail = function (email) {
   return this.findOne({ email: email.toLowerCase() });
 };
 
-// Function to calculate leaderboard
 userSchema.statics.getLeaderboard = async function () {
   try {
     const leaderboard = await this.aggregate([
       {
         $lookup: {
-          from: "logs", // Collection name for logs (usually lowercase plural)
+          from: "logs",
           localField: "_id",
           foreignField: "userId",
           as: "userLogs",
@@ -122,7 +117,6 @@ userSchema.statics.getLeaderboard = async function () {
   }
 };
 
-// Function to get total CO2 saved by a specific user
 userSchema.statics.getUserTotalCO2 = async function (userId) {
   try {
     const result = await this.aggregate([
@@ -149,7 +143,6 @@ userSchema.statics.getUserTotalCO2 = async function (userId) {
   }
 };
 
-// Function to get total CO2 saved by all users
 userSchema.statics.getTotalCO2 = async function () {
   try {
     const result = await this.aggregate([
@@ -176,7 +169,6 @@ userSchema.statics.getTotalCO2 = async function () {
   }
 };
 
-// Log schema methods
 logSchema.statics.findByUserId = function (userId) {
   return this.find({ userId }).sort({ date: -1 });
 };

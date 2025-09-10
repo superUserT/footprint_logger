@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const dotenv = require("dotenv");
 const pino = require("pino");
-const { User } = require("../models/database.js"); // Import the User model
+const { User } = require("../models/database.js");
 const { authMessages } = require("../utils/helper_objects.js");
 const {
   registrationValidation,
@@ -19,14 +19,12 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post("/register", registrationValidation, async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       logger.error("Validation errors during registration", errors.array());
       return res.status(400).json({ error: errors.array()[0].msg });
     }
 
-    // Use Mongoose model instead of raw MongoDB
     const existingUser = await User.findByEmail(req.body.email);
 
     if (existingUser) {
@@ -37,9 +35,8 @@ router.post("/register", registrationValidation, async (req, res) => {
     const salt = await bcryptjs.genSalt(10);
     const hash = await bcryptjs.hash(req.body.password, salt);
 
-    // Create new user using Mongoose model
     const newUser = new User({
-      username: req.body.username || req.body.firstName, // Adjust based on your schema
+      username: req.body.username || req.body.firstName,
       email: req.body.email,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -67,14 +64,12 @@ router.post("/login", loginValidation, async (req, res) => {
   console.log("\n\n Inside login");
 
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       logger.error("Validation errors during login", errors.array());
       return res.status(400).json({ error: errors.array()[0].msg });
     }
 
-    // Use Mongoose model instead of raw MongoDB
     const theUser = await User.findByEmail(req.body.email);
 
     if (theUser) {
@@ -106,8 +101,7 @@ router.post("/login", loginValidation, async (req, res) => {
       .json({ error: authMessages.internalServerError, details: e.message });
   }
 });
-
-// Update API
+//not gonna use this one yet or ever big dog
 router.put("/update", async (req, res) => {
   const errors = validationResult(req);
 
@@ -124,7 +118,6 @@ router.put("/update", async (req, res) => {
       return res.status(400).json({ error: authMessages.emailNotInHeader });
     }
 
-    // Use Mongoose model instead of raw MongoDB
     const existingUser = await User.findByEmail(email);
 
     if (!existingUser) {
@@ -132,7 +125,6 @@ router.put("/update", async (req, res) => {
       return res.status(404).json({ error: authMessages.userNotFound });
     }
 
-    // Update user using Mongoose
     existingUser.firstName = req.body.name;
     existingUser.updatedAt = new Date();
 

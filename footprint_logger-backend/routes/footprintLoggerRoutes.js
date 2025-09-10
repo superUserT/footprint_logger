@@ -1,21 +1,19 @@
-// footprintLoggerRoutes.js
 const express = require("express");
 const { Log, User } = require("../models/database.js");
 const { logger } = require("../footprint_loggger.js");
 const { errorMessages } = require("../utils/helper_objects.js");
 const router = express.Router();
 
-// Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ error: "Access token required" });
   }
 
   try {
-    const jwt = require('jsonwebtoken');
+    const jwt = require("jsonwebtoken");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded.user;
     next();
@@ -24,7 +22,6 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-// Get all logs for authenticated user
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const logs = await Log.find({ userId: req.user.id }).sort({ date: -1 });
@@ -35,12 +32,11 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-// Get a single log by ID
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const log = await Log.findOne({
       _id: req.params.id,
-      userId: req.user.id
+      userId: req.user.id,
     });
 
     if (!log) {
@@ -54,15 +50,13 @@ router.get("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Create a new log
 router.post("/", authenticateToken, async (req, res) => {
   try {
     const { date, activity, co2Saved, details } = req.body;
 
-    // Get the next logId for this user
     const lastLog = await Log.findOne({ userId: req.user.id })
-        .sort({ logId: -1 })
-        .limit(1);
+      .sort({ logId: -1 })
+      .limit(1);
 
     const nextLogId = lastLog ? lastLog.logId + 1 : 1;
 
@@ -72,7 +66,7 @@ router.post("/", authenticateToken, async (req, res) => {
       date: new Date(date),
       activity,
       co2Saved: parseFloat(co2Saved),
-      details
+      details,
     });
 
     const savedLog = await newLog.save();
@@ -85,21 +79,20 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 });
 
-// Update a log
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const { date, activity, co2Saved, details } = req.body;
 
     const updatedLog = await Log.findOneAndUpdate(
-        { _id: req.params.id, userId: req.user.id },
-        {
-          date: new Date(date),
-          activity,
-          co2Saved: parseFloat(co2Saved),
-          details,
-          updatedAt: new Date()
-        },
-        { new: true, runValidators: true }
+      { _id: req.params.id, userId: req.user.id },
+      {
+        date: new Date(date),
+        activity,
+        co2Saved: parseFloat(co2Saved),
+        details,
+        updatedAt: new Date(),
+      },
+      { new: true, runValidators: true }
     );
 
     if (!updatedLog) {
@@ -113,12 +106,11 @@ router.put("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Delete a log
 router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const deletedLog = await Log.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user.id
+      userId: req.user.id,
     });
 
     if (!deletedLog) {
@@ -132,7 +124,6 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Get user log statistics
 router.get("/user/stats", authenticateToken, async (req, res) => {
   try {
     const stats = await Log.aggregate([
@@ -147,11 +138,14 @@ router.get("/user/stats", authenticateToken, async (req, res) => {
       },
     ]);
 
-    const result = stats.length > 0 ? stats[0] : {
-      totalCo2Saved: 0,
-      activityCount: 0,
-      averageCo2PerActivity: 0
-    };
+    const result =
+      stats.length > 0
+        ? stats[0]
+        : {
+            totalCo2Saved: 0,
+            activityCount: 0,
+            averageCo2PerActivity: 0,
+          };
 
     res.json(result);
   } catch (error) {
@@ -160,7 +154,6 @@ router.get("/user/stats", authenticateToken, async (req, res) => {
   }
 });
 
-// Get leaderboard
 router.get("/leaderboard/global", async (req, res) => {
   try {
     const leaderboard = await User.getLeaderboard();
@@ -170,7 +163,6 @@ router.get("/leaderboard/global", async (req, res) => {
   }
 });
 
-// Get total CO2 saved
 router.get("/stats/total-co2", async (req, res) => {
   try {
     const totalCO2 = await User.getTotalCO2();
