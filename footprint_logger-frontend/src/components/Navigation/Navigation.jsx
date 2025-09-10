@@ -34,7 +34,7 @@ const Navigation = () => {
   };
 
   const menuItems = [
-    { text: "Home", path: "/", icon: <HomeIcon /> },
+    { text: "Home", path: "/homepage", icon: <HomeIcon /> },
     { text: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
     { text: "Submit Log", path: "/submit-log", icon: <AddIcon /> },
     { text: "Profile", path: "/profile", icon: <PersonIcon /> },
@@ -43,7 +43,6 @@ const Navigation = () => {
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center", width: 250 }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        {/* <EcoIcon sx={{ mr: 1, verticalAlign: "bottom" }} /> */}
         Footprint Logger
       </Typography>
       <List>
@@ -87,7 +86,6 @@ const Navigation = () => {
           </IconButton>
         )}
 
-        {/* <EcoIcon sx={{ mr: 1, display: { xs: "none", md: "flex" } }} /> */}
         <Typography
           variant="h6"
           component={Link}

@@ -18,14 +18,13 @@ import Register from "./components/Register/Register";
 import SubmitLog from "./components/SubmitPage/SubmitLog";
 import Navigation from "./components/Navigation/Navigation";
 
-// Custom theme for the application
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#2E7D32", // Green theme for environmental app
+      main: "#2E7D32",
     },
     secondary: {
-      main: "#FF8F00", // Orange accent
+      main: "#FF8F00",
     },
     background: {
       default: "#F5F5F5",
@@ -52,64 +51,65 @@ function App() {
   ]);
 
   return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AuthProvider>
-          <Router>
-            <div className="App">
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-                {/* Redirect root to login */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
+              {/* Redirect root to login */}
+              {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
 
-                {/* Protected Routes with Navigation */}
-                <Route
-                    path="/homepage"
-                    element={
-                      <ProtectedRoute>
-                        <Navigation />
-                        <Homepage />
-                      </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Navigation />
-                        <Dashboard logs={logs} setLogs={setLogs} /> {/* ✅ Removed user prop */}
-                      </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/profile"
-                    element={
-                      <ProtectedRoute>
-                        <Navigation />
-                        <Profile /> {/* ✅ Removed user prop */}
-                      </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/submit-log"
-                    element={
-                      <ProtectedRoute>
-                        <Navigation />
-                        <SubmitLog logs={logs} setLogs={setLogs} />
-                      </ProtectedRoute>
-                    }
-                />
+              {/* Protected Routes with Navigation */}
+              <Route
+                path="/homepage"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <Homepage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <Dashboard logs={logs} setLogs={setLogs} />{" "}
+                    {/* ✅ Removed user prop */}
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/submit-log"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <SubmitLog logs={logs} setLogs={setLogs} />
+                  </ProtectedRoute>
+                }
+              />
 
-                {/* Catch all - redirect to login */}
-                <Route path="*" element={<Navigate to="/login" replace />} />
-              </Routes>
-            </div>
-          </Router>
-        </AuthProvider>
-      </ThemeProvider>
+              {/* Catch all - redirect to login */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </div>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
