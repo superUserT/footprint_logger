@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const { connectDB } = require("./config/mongoDbConfig.js");
 const { User, Log } = require("./models/database.js");
@@ -14,11 +13,7 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-connectDB()
-  .then(() => {
-    logger.info("Connected to DB");
-  })
-  .catch((error) => console.error("Failed to connect to DB", error));
+connectDB();
 
 const allowedOrigins = [
   "http://localhost:5173",
