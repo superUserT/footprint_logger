@@ -8,6 +8,7 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import {
   TrendingDown,
@@ -24,9 +25,10 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [stats, setStats] = useState({
     totalCo2Saved: 0,
     activityCount: 0,
@@ -34,21 +36,27 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    fetchUserLogs();
-    fetchUserStats();
-  }, []);
+    if (token) {
+      fetchUserLogs();
+      fetchUserStats();
+    }
+  }, [token]);
 
   const fetchUserLogs = async () => {
     try {
-      const token = localStorage.getItem("authToken");
       const response = await axios.get(`${API_BASE_URL}/api/logs`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setLogs(response.data);
+      setError(null);
     } catch (error) {
-      console.error("Error fetching logs:", error);
+      console.error(
+        "Error fetching logs:",
+        error.response?.data || error.message
+      );
+      setError("Failed to load activities");
     } finally {
       setLoading(false);
     }
@@ -56,15 +64,19 @@ const Dashboard = () => {
 
   const fetchUserStats = async () => {
     try {
-      const token = localStorage.getItem("authToken");
+      console.log("Fetching stats with token:", token);
       const response = await axios.get(`${API_BASE_URL}/api/logs/user/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log("Stats response:", response.data);
       setStats(response.data);
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      console.error(
+        "Error fetching stats:",
+        error.response?.data || error.message
+      );
     }
   };
 
@@ -118,6 +130,12 @@ const Dashboard = () => {
 
       <Notification />
 
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <Grid container spacing={3}>
         {/* Stats Cards */}
         {statCards.map((stat, index) => (
@@ -150,7 +168,12 @@ const Dashboard = () => {
         {/* Submit Log */}
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 2 }}>
-            <SubmitLog onLogAdded={fetchUserLogs} />
+            <SubmitLog
+              onLogAdded={() => {
+                fetchUserLogs();
+                fetchUserStats();
+              }}
+            />
           </Paper>
         </Grid>
 
@@ -162,7 +185,7 @@ const Dashboard = () => {
             </Typography>
             {logs.length > 0 ? (
               <Box>
-                {logs.map((log) => (
+                {logs.slice(0, 5).map((log) => (
                   <Box
                     key={log._id}
                     sx={{

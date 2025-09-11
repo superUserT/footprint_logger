@@ -177,8 +177,11 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 
 router.get("/user/stats", authenticateToken, async (req, res) => {
   try {
+    const mongoose = require("mongoose");
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+
     const stats = await Log.aggregate([
-      { $match: { userId: req.user.id } },
+      { $match: { userId: userId } },
       {
         $group: {
           _id: "$userId",
@@ -197,6 +200,8 @@ router.get("/user/stats", authenticateToken, async (req, res) => {
             activityCount: 0,
             averageCo2PerActivity: 0,
           };
+
+    delete result._id;
 
     footprintLogger.debug(`Stats fetched for user ${req.user.id}`, result);
     res.json(result);
