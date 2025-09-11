@@ -10,7 +10,7 @@ const {
   loginValidation,
 } = require("../utils/helper_functions.js");
 const { validationResult } = require("express-validator");
-const { authLogger } = require("../footprint_loggger.js"); // Import auth-specific logger
+const { authLogger } = require("../footprint_loggger.js");
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;

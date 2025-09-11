@@ -20,6 +20,7 @@ import {
   Person as PersonIcon,
   Add as AddIcon,
   Home as HomeIcon,
+  Leaderboard as LeaderboardIcon,
 } from "@mui/icons-material";
 import Notification from "../Notifications/Notification";
 
@@ -38,6 +39,7 @@ const Navigation = () => {
     { text: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
     { text: "Submit Log", path: "/submit-log", icon: <AddIcon /> },
     { text: "Profile", path: "/profile", icon: <PersonIcon /> },
+    { text: "Leaderboard", path: "/leaderboard", icon: <LeaderboardIcon /> },
   ];
 
   const drawer = (

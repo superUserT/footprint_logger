@@ -4,10 +4,11 @@
 
 1. Fix login issue I have everytime I press Home page # done
 2. Create a logout button
-3. Create a GET route to get all the id' for the user and show the data in the dashboard page
+3. Create a GET route to get all the id' for the user and show the data in the dashboard page => in progress
 4. Create a route save the user's weekly goals
 5. Create a dashboard page and utilise the dashboard route to get that data.
 6. Fix the member date bug in profile
+7. Fix Weekly goals page
 
 # Part 3
 

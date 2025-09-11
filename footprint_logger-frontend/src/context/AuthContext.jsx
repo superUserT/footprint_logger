@@ -1,4 +1,3 @@
-// AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
@@ -12,7 +11,6 @@ export const useAuth = () => {
   return context;
 };
 
-// Keep the old hook for backward compatibility
 export const useAppContext = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -23,16 +21,15 @@ export const useAppContext = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Keep for backward compatibility
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [userName, setUserName] = useState(""); // Keep for backward compatibility
+  const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkAuthStatus();
   }, []);
 
-  // Sync the old state with new state for backward compatibility
   useEffect(() => {
     setIsLoggedIn(isAuthenticated);
     setUserName(user?.name || "");
@@ -45,7 +42,6 @@ export const AuthProvider = ({ children }) => {
 
     if (token) {
       try {
-        // Decode and validate token
         const tokenData = jwtDecode(token);
         const currentTime = Date.now() / 1000;
 
@@ -55,15 +51,13 @@ export const AuthProvider = ({ children }) => {
             name: storedUserName,
             email: userEmail,
             id: tokenData.user.id,
-            // Add default weekly goal for existing functionality
+
             weeklyGoal: 50,
           });
         } else {
-          // Token expired
           logout();
         }
       } catch (error) {
-        // Invalid token
         logout();
       }
     }
@@ -75,7 +69,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("userName", userName);
     localStorage.setItem("userEmail", userEmail);
 
-    // Decode token to get user ID
     const tokenData = jwtDecode(token);
 
     setIsAuthenticated(true);
@@ -83,7 +76,7 @@ export const AuthProvider = ({ children }) => {
       name: userName,
       email: userEmail,
       id: tokenData.user.id,
-      weeklyGoal: 50, // Default weekly goal
+      weeklyGoal: 50, // Default weekly goal, change this soon
     });
   };
 
@@ -96,14 +89,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const value = {
-    // New authentication methods
     isAuthenticated,
     user,
     login,
     logout,
     loading,
 
-    // Keep old methods for backward compatibility
     isLoggedIn,
     setIsLoggedIn: setIsAuthenticated,
     userName,

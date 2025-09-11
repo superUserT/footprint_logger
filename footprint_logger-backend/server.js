@@ -38,7 +38,6 @@ app.use(
 );
 
 app.use(express.json());
-// app.use(pinoHttp({ pinoLogger: logger }));
 
 const footprintLoggerRoutes = require("./routes/footprintLoggerRoutes.js");
 const authRoutes = require("./routes/authRoutes.js");

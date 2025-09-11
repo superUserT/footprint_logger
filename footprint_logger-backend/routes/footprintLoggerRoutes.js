@@ -4,6 +4,28 @@ const { footprintLogger } = require("../footprint_loggger.js");
 const { errorMessages } = require("../utils/helper_objects.js");
 const router = express.Router();
 
+router.get("/leaderboard", async (req, res) => {
+  try {
+    const leaderboard = await User.getLeaderboard();
+    footprintLogger.debug("Global leaderboard fetched");
+    res.json(leaderboard);
+  } catch (error) {
+    footprintLogger.error("Error fetching leaderboard:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/stats/total-co2", async (req, res) => {
+  try {
+    const totalCO2 = await User.getTotalCO2();
+    footprintLogger.debug("Total CO2 stats fetched");
+    res.json(totalCO2);
+  } catch (error) {
+    footprintLogger.error("Error fetching total CO2 stats:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -181,28 +203,6 @@ router.get("/user/stats", authenticateToken, async (req, res) => {
   } catch (error) {
     footprintLogger.error("Error getting user stats:", error);
     res.status(500).json({ error: errorMessages.internalServerError });
-  }
-});
-
-router.get("/leaderboard/global", async (req, res) => {
-  try {
-    const leaderboard = await User.getLeaderboard();
-    footprintLogger.debug("Global leaderboard fetched");
-    res.json(leaderboard);
-  } catch (error) {
-    footprintLogger.error("Error fetching leaderboard:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/stats/total-co2", async (req, res) => {
-  try {
-    const totalCO2 = await User.getTotalCO2();
-    footprintLogger.debug("Total CO2 stats fetched");
-    res.json(totalCO2);
-  } catch (error) {
-    footprintLogger.error("Error fetching total CO2 stats:", error);
-    res.status(500).json({ error: error.message });
   }
 });
 

@@ -1,4 +1,3 @@
-// App.js
 import React, { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -17,6 +16,7 @@ import Profile from "./components/Profile/Profile";
 import Register from "./components/Register/Register";
 import SubmitLog from "./components/SubmitPage/SubmitLog";
 import Navigation from "./components/Navigation/Navigation";
+import Leaderboard from "./components/Leaderboard/Leaderboard";
 
 const theme = createTheme({
   palette: {
@@ -60,6 +60,7 @@ function App() {
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
 
               {/* Redirect root to login */}
               {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
@@ -102,7 +103,15 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
+              <Route
+                path="/leaderboard"
+                element={
+                  <ProtectedRoute>
+                    <Navigation />
+                    <Leaderboard />
+                  </ProtectedRoute>
+                }
+              />
               {/* Catch all - redirect to login */}
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
