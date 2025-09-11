@@ -60,7 +60,6 @@ function App() {
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
 
               {/* Redirect root to login */}
               {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}

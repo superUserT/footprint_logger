@@ -92,6 +92,7 @@ userSchema.statics.findByEmail = function (email) {
 userSchema.statics.getLeaderboard = async function () {
   try {
     const leaderboard = await this.aggregate([
+      { $match: { isActive: true } },
       {
         $lookup: {
           from: "logs",
@@ -108,7 +109,6 @@ userSchema.statics.getLeaderboard = async function () {
         },
       },
       { $sort: { totalCo2Saved: -1 } },
-      { $match: { isActive: true } },
     ]);
 
     return leaderboard;
