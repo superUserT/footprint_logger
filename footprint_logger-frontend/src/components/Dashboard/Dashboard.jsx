@@ -9,17 +9,25 @@ import {
   CardContent,
   CircularProgress,
   Alert,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import {
   TrendingDown,
   EmojiTransportation,
   CompareArrows,
+  EmojiEvents,
+  Lightbulb,
+  TrendingUp,
 } from "@mui/icons-material";
 import WeeklyGoal from "../WeeklyGoalsPage/WeeklyGoal";
 import SubmitLog from "../SubmitPage/SubmitLog";
 import Notification from "../Notifications/Notification";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
+import EmissionSentimentAnalyzer from "../../../../insight_engine/insight_engine.js";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
@@ -34,6 +42,8 @@ const Dashboard = () => {
     activityCount: 0,
     averageCo2PerActivity: 0,
   });
+  const [insights, setInsights] = useState(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -41,6 +51,12 @@ const Dashboard = () => {
       fetchUserStats();
     }
   }, [token]);
+
+  useEffect(() => {
+    if (stats.activityCount > 0 && logs.length > 0) {
+      generateInsights();
+    }
+  }, [stats, logs]);
 
   const fetchUserLogs = async () => {
     try {
@@ -64,19 +80,53 @@ const Dashboard = () => {
 
   const fetchUserStats = async () => {
     try {
-      console.log("Fetching stats with token:", token);
       const response = await axios.get(`${API_BASE_URL}/api/logs/user/stats`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Stats response:", response.data);
       setStats(response.data);
     } catch (error) {
       console.error(
         "Error fetching stats:",
         error.response?.data || error.message
       );
+    }
+  };
+
+  const generateInsights = () => {
+    setInsightsLoading(true);
+    try {
+      const analyzer = new EmissionSentimentAnalyzer();
+      const analysis = analyzer.analyzeUserPerformance(stats, logs);
+      const personalizedMessage =
+        analyzer.generatePersonalizedMessage(analysis);
+      setInsights(personalizedMessage);
+    } catch (error) {
+      console.error("Error generating insights:", error);
+      setInsights(null);
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 80) return "#2E7D32"; // Green for excellent
+    if (score >= 60) return "#FF8F00"; // Orange for good
+    if (score >= 40) return "#1976D2"; // Blue for average
+    return "#D32F2F"; // Red for beginner
+  };
+
+  const getCategoryIcon = (category) => {
+    switch (category) {
+      case "excellent":
+        return <EmojiEvents sx={{ color: "#2E7D32" }} />;
+      case "good":
+        return <TrendingUp sx={{ color: "#FF8F00" }} />;
+      case "average":
+        return <Lightbulb sx={{ color: "#1976D2" }} />;
+      default:
+        return <Lightbulb sx={{ color: "#D32F2F" }} />;
     }
   };
 
@@ -97,8 +147,9 @@ const Dashboard = () => {
       color: "#1565C0",
     },
     {
-      title: "Current Streak",
-      value: "3 days",
+      title: "Avg per Activity",
+      value: `${stats.averageCo2PerActivity?.toFixed(1) || 0} kg`,
+      icon: <CompareArrows sx={{ fontSize: 40 }} />,
       color: "#FF8F00",
     },
     {
@@ -158,6 +209,89 @@ const Dashboard = () => {
           </Grid>
         ))}
 
+        {/* Sustainability Insights */}
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} sx={{ p: 2, height: "100%" }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              📊 Sustainability Insights
+              {insightsLoading && <CircularProgress size={20} sx={{ ml: 1 }} />}
+            </Typography>
+
+            {insights ? (
+              <Box>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: "50%",
+                      backgroundColor: getScoreColor(insights.score),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.2rem",
+                      mr: 2,
+                    }}
+                  >
+                    {insights.score}
+                  </Box>
+                  <Box>
+                    <Typography variant="body1" fontWeight="bold">
+                      {insights.message}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {insights.category.charAt(0).toUpperCase() +
+                        insights.category.slice(1)}{" "}
+                      performance
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {insights.suggestions && insights.suggestions.length > 0 && (
+                  <Box>
+                    <Typography
+                      variant="subtitle2"
+                      gutterBottom
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <Lightbulb sx={{ mr: 1, fontSize: 20 }} />
+                      Suggestions for improvement:
+                    </Typography>
+                    <List dense>
+                      {insights.suggestions.map((suggestion, index) => (
+                        <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
+                          <ListItemIcon sx={{ minWidth: 30 }}>
+                            <Typography color="primary">•</Typography>
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography variant="body2">
+                                {suggestion}
+                              </Typography>
+                            }
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Box>
+                )}
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                {stats.activityCount === 0
+                  ? "Start logging activities to get personalized insights!"
+                  : "Generating insights..."}
+              </Typography>
+            )}
+          </Paper>
+        </Grid>
+
         {/* Weekly Goal */}
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 2 }}>
@@ -178,7 +312,7 @@ const Dashboard = () => {
         </Grid>
 
         {/* Recent Activities */}
-        <Grid item xs={12}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Recent Activities

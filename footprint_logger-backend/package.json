@@ -8,7 +8,11 @@
     "test": "jest",
     "start": "nodemon --ignore 'Logs/*.json' --ignore node_modules server.js"
   },
-  "author": "Thabiso Rantsho",
+  "author": {
+    "name": "Thabiso Rantsho",
+    "email": "thabiso.rantsho@Umuzi.org",
+    "github": "https://github.com/superUserT"
+  },
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.2",

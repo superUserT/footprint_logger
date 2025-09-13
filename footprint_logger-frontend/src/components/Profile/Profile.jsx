@@ -65,14 +65,7 @@ const Profile = () => {
                 disabled={!editing}
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Member Since"
-                value="June 2023"
-                disabled
-              />
-            </Grid>
+
             <Grid item xs={12}>
               <TextField
                 fullWidth

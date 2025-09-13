@@ -4,6 +4,11 @@
   "version": "0.0.0",
   "proxy": "http://localhost:3001",
   "type": "module",
+  "author": {
+    "name": "Thabiso Rantsho",
+    "email": "thabiso.rantsho@Umuzi.org",
+    "github": "https://github.com/superUserT"
+  },
   "scripts": {
     "start": "vite",
     "build": "vite build",
