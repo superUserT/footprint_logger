@@ -111,10 +111,10 @@ const Dashboard = () => {
   };
 
   const getScoreColor = (score) => {
-    if (score >= 80) return "#2E7D32"; // Green for excellent
-    if (score >= 60) return "#FF8F00"; // Orange for good
-    if (score >= 40) return "#1976D2"; // Blue for average
-    return "#D32F2F"; // Red for beginner
+    if (score >= 80) return "#2E7D32";
+    if (score >= 60) return "#FF8F00";
+    if (score >= 40) return "#1976D2";
+    return "#D32F2F";
   };
 
   const getCategoryIcon = (category) => {

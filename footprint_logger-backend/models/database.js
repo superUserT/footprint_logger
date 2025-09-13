@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { type } = require("os");
 
 const userSchema = new mongoose.Schema(
   {
@@ -71,6 +72,35 @@ const logSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+const weeklygoalSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  id: {
+    type: Number,
+    required: true,
+  },
+  startDate: {
+    type: Date,
+    required: true,
+  },
+  endDate: {
+    type: Date,
+    required: true,
+    default: function () {
+      const date = new Date(this.startDate);
+      date.setDate(date.getDate() + 7);
+      return date;
+    },
+  },
+  goal: {
+    type: Number,
+    required: true,
+  },
+});
 
 userSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
@@ -195,5 +225,6 @@ logSchema.statics.getUserLogStats = async function (userId) {
 
 const User = mongoose.model("User", userSchema);
 const Log = mongoose.model("Log", logSchema);
+const WeeklyGoal = mongoose.model("WeeklyGoal", weeklygoalSchema);
 
-module.exports = { User, Log };
+module.exports = { User, Log, WeeklyGoal };

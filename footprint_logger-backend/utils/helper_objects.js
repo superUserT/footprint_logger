@@ -15,6 +15,8 @@ const errorMessages = {
   cannotConnectToDB: "Cannot connect to database",
   notAdmin: "You are not an admin",
   ConnectionError: "Database connection error:",
+  corsDenied:
+    "The CORS policy for this site does not allow access from the specified Origin.",
 };
 
 const misc = {

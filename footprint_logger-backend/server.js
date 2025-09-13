@@ -1,9 +1,7 @@
 const express = require("express");
 const { connectDB } = require("./config/mongoDbConfig.js");
-const { User, Log } = require("./models/database.js");
+const { User, Log, WeeklyGoal } = require("./models/database.js");
 const cors = require("cors");
-const { logger } = require("./footprint_loggger.js");
-const pinoHttp = require("pino-http");
 const {
   errorMessages,
   authMessages,
@@ -27,8 +25,7 @@ app.use(
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
+        const msg = errorMessages.corsDenied;
         return callback(new Error(msg), false);
       }
       return callback(null, true);
@@ -41,9 +38,11 @@ app.use(express.json());
 
 const footprintLoggerRoutes = require("./routes/footprintLoggerRoutes.js");
 const authRoutes = require("./routes/authRoutes.js");
+const weeklyGoalRoutes = require("./routes/weeklyGoalRoute.js");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/logs", footprintLoggerRoutes);
+app.use("/api/goals", weeklyGoalRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);
