@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "type": "commonjs",
   "description": "Backend Logic for footprint Logger",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "jest",
-    "start": "nodemon server.js"
+    "test": "jasmine",
+    "start": "nodemon --ignore 'Logs/*.json' --ignore node_modules server.js"
   },
-  "author": "Thabiso Rantsho",
+  "author": {
+    "name": "Thabiso Rantsho",
+    "email": "thabiso.rantsho@Umuzi.org",
+    "github": "https://github.com/superUserT"
+  },
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -18,7 +22,6 @@
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "express-validator": "^7.2.1",
-    "jasmine": "^5.9.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.18.0",
     "mongoose": "^8.18.0",
@@ -27,5 +30,9 @@
     "pino": "^9.9.0",
     "pino-http": "^10.5.0",
     "pino-pretty": "^13.1.1"
+  },
+  "devDependencies": {
+    "jasmine": "^5.10.0",
+    "supertest": "^7.1.4"
   }
 }

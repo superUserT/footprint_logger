@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -13,6 +13,9 @@ import {
   ListItemText,
   useMediaQuery,
   useTheme,
+  Menu,
+  MenuItem,
+  Avatar,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -21,17 +24,37 @@ import {
   Add as AddIcon,
   Home as HomeIcon,
   Leaderboard as LeaderboardIcon,
+  Logout as LogoutIcon,
+  AccountCircle,
 } from "@mui/icons-material";
 import Notification from "../Notifications/Notification";
+import { useAuth } from "../../context/AuthContext";
 
 const Navigation = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
+    navigate("/login");
   };
 
   const menuItems = [
@@ -69,6 +92,26 @@ const Navigation = () => {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
+
+        {/* Mobile Logout Option */}
+        {isAuthenticated && (
+          <ListItem
+            button
+            onClick={handleLogout}
+            sx={{
+              color: "inherit",
+              "&:hover": {
+                backgroundColor: "error.main",
+                color: "white",
+              },
+            }}
+          >
+            <Box sx={{ mr: 2 }}>
+              <LogoutIcon />
+            </Box>
+            <ListItemText primary="Logout" />
+          </ListItem>
+        )}
       </List>
     </Box>
   );
@@ -91,7 +134,7 @@ const Navigation = () => {
         <Typography
           variant="h6"
           component={Link}
-          to="/"
+          to={isAuthenticated ? "/dashboard" : "/"}
           sx={{
             mr: 2,
             flexGrow: { xs: 1, md: 0 },
@@ -129,11 +172,67 @@ const Navigation = () => {
           ))}
         </Box>
 
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <Notification />
-          <Button color="inherit" component={Link} to="/login" sx={{ ml: 1 }}>
-            Login
-          </Button>
+
+          {isAuthenticated ? (
+            <>
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls="primary-search-account-menu"
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+                sx={{ ml: 1 }}
+              >
+                {user?.name ? (
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      bgcolor: "secondary.main",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    {user.name.charAt(0).toUpperCase()}
+                  </Avatar>
+                ) : (
+                  <AccountCircle />
+                )}
+              </IconButton>
+
+              <Menu
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem disabled>
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    {user?.name || "User"}
+                  </Typography>
+                </MenuItem>
+                <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
+                  <LogoutIcon sx={{ mr: 1 }} />
+                  Logout
+                </MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <Button color="inherit" component={Link} to="/login" sx={{ ml: 1 }}>
+              Login
+            </Button>
+          )}
         </Box>
       </Toolbar>
 

@@ -1,0 +1,20 @@
+{
+  "name": "insight_engine",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "insight_engine.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Thabiso Rantsho",
+    "email": "thabiso.rantsho@Umuzi.org",
+    "github": "https://github.com/superUserT"
+  },
+  "license": "ISC",
+  "description": "an insight engine that automatically analyses user activity and provides weekly tips based on their highest-emission behaviours.",
+  "devDependencies": {
+    "jasmine": "^5.10.0"
+  }
+}

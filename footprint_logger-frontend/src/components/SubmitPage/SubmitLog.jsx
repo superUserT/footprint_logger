@@ -9,6 +9,10 @@ import {
   Select,
   FormControl,
   InputLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import axios from "axios";
@@ -24,6 +28,9 @@ const SubmitLog = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [customActivityDialogOpen, setCustomActivityDialogOpen] =
+    useState(false);
+  const [customActivity, setCustomActivity] = useState("");
 
   const { user } = useAuth();
   const [details, setDetails] = useState({});
@@ -35,12 +42,33 @@ const SubmitLog = () => {
     { value: "hotShower", label: "Hot Shower" },
     { value: "watchTV", label: "Watched TV" },
     { value: "orderedIn", label: "Ordered In" },
+    { value: "custom", label: "+ Add Custom Activity" },
   ];
 
   const handleActivityChange = (e) => {
-    setActivity(e.target.value);
-    setDetails({});
-    setCo2Saved("");
+    const selectedValue = e.target.value;
+
+    if (selectedValue === "custom") {
+      setCustomActivityDialogOpen(true);
+      setActivity(""); // Clear current selection
+    } else {
+      setActivity(selectedValue);
+      setDetails({});
+      setCo2Saved("");
+    }
+  };
+
+  const handleAddCustomActivity = () => {
+    if (customActivity.trim()) {
+      setActivity(customActivity.trim());
+      setCustomActivity("");
+      setCustomActivityDialogOpen(false);
+    }
+  };
+
+  const handleCloseCustomDialog = () => {
+    setCustomActivityDialogOpen(false);
+    setCustomActivity("");
   };
 
   const handleDetailChange = (field, value) => {
@@ -120,21 +148,27 @@ const SubmitLog = () => {
 
       <Box component="form" onSubmit={handleSubmit}>
         {/* Activity Type */}
-        <TextField
-          select
-          fullWidth
-          label="Activity Type"
-          value={activity}
-          onChange={handleActivityChange}
-          margin="normal"
-          required
-        >
-          {activityTypes.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
+        <FormControl fullWidth margin="normal" required>
+          <InputLabel>Activity Type</InputLabel>
+          <Select
+            value={activity}
+            onChange={handleActivityChange}
+            label="Activity Type"
+          >
+            {activityTypes.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        {/* Display custom activity if selected */}
+        {activity && !activityTypes.some((opt) => opt.value === activity) && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Custom Activity: <strong>{activity}</strong>
+          </Alert>
+        )}
 
         {/* CO₂ Saved */}
         <TextField
@@ -173,6 +207,44 @@ const SubmitLog = () => {
           {loading ? "Submitting..." : "Add Activity"}
         </Button>
       </Box>
+
+      {/* Custom Activity Dialog */}
+      <Dialog
+        open={customActivityDialogOpen}
+        onClose={handleCloseCustomDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Add Custom Activity</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Custom Activity Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={customActivity}
+            onChange={(e) => setCustomActivity(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddCustomActivity();
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCustomDialog}>Cancel</Button>
+          <Button
+            onClick={handleAddCustomActivity}
+            variant="contained"
+            disabled={!customActivity.trim()}
+          >
+            Add Activity
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
