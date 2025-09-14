@@ -1,12 +1,14 @@
+import {
+  suggestionsKey,
+  personalisedMessages,
+} from "./utils/helper_objects.js";
+
 export default class EmissionSentimentAnalyzer {
-  constructor() {
-    // No need for natural library dependencies
-  }
+  constructor() {}
 
   analyzeUserPerformance(userStats, recentLogs = []) {
     const { totalCo2Saved, activityCount, averageCo2PerActivity } = userStats;
 
-    // Calculate performance scores (0-100)
     const frequencyScore = this.calculateFrequencyScore(activityCount);
     const impactScore = this.calculateImpactScore(totalCo2Saved);
     const consistencyScore = this.calculateConsistencyScore(recentLogs);
@@ -63,32 +65,24 @@ export default class EmissionSentimentAnalyzer {
     const suggestions = [];
 
     if (frequencyScore < 40) {
-      suggestions.push(
-        "Try to log at least 2-3 activities per week to build better habits."
-      );
+      suggestions.push(suggestionsKey.lessThan40);
     }
 
     if (impactScore < 50) {
-      suggestions.push(
-        "Focus on high-impact activities like biking to work or reducing meat consumption."
-      );
+      suggestions.push(suggestionsKey.lessThan50);
     }
 
     if (consistencyScore < 60) {
-      suggestions.push(
-        "Consistency is key! Try to make sustainable activities part of your daily routine."
-      );
+      suggestions.push(suggestions.lessThan60);
     }
 
     if (overallScore >= 70) {
-      suggestions.push(
-        "Great job! Consider mentoring others or setting more ambitious goals."
-      );
+      suggestions.push(suggestionsKey.greaterThan70);
     }
 
     return suggestions.length > 0
       ? suggestions
-      : ["Keep up the good work! You're doing great."];
+      : [suggestionsKey.defaultSuggestion];
   }
 
   analyzeSentiment(text) {
@@ -127,31 +121,10 @@ export default class EmissionSentimentAnalyzer {
   generatePersonalizedMessage(analysis) {
     const { category, overallScore, suggestions } = analysis;
 
-    const messages = {
-      excellent: [
-        "🌟 Outstanding! You're a sustainability superstar!",
-        "🔥 Amazing work! You're making a significant environmental impact!",
-        "✅ Perfect! You've mastered sustainable living habits!",
-      ],
-      good: [
-        "👍 Great job! You're well on your way to sustainability mastery!",
-        "📈 Solid progress! Your consistent efforts are paying off!",
-        "💚 Well done! You're making a positive difference every day!",
-      ],
-      average: [
-        "📊 Good start! Every small action contributes to bigger change!",
-        "🌱 You're building great habits! Try to be more consistent.",
-        "🔄 Keep going! Sustainability is a journey of continuous improvement.",
-      ],
-      beginner: [
-        "👋 Welcome to your sustainability journey! Every step counts!",
-        "🚀 Ready to start? Pick one sustainable habit to focus on this week!",
-        "💡 Beginner's mind! You have a great opportunity to build lasting habits!",
-      ],
-    };
-
     const randomMessage =
-      messages[category][Math.floor(Math.random() * messages[category].length)];
+      personalisedMessages[category][
+        Math.floor(Math.random() * personalisedMessages[category].length)
+      ];
 
     return {
       message: randomMessage,

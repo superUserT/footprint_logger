@@ -45,7 +45,7 @@ const WeeklyGoal = () => {
       }
     } catch (error) {
       console.error("Error fetching weekly goal:", error);
-      // If no goal exists, use default of 50
+
       setGoal(50);
     } finally {
       setLoading(false);
@@ -63,7 +63,7 @@ const WeeklyGoal = () => {
       const logs = response.data;
       const now = new Date();
       const startOfWeek = new Date(now);
-      startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+      startOfWeek.setDate(now.getDate() - now.getDay());
       startOfWeek.setHours(0, 0, 0, 0);
 
       const weeklyLogs = logs.filter((log) => {
@@ -91,7 +91,7 @@ const WeeklyGoal = () => {
         {
           userId: user.id,
           goal: goal,
-          startDate: new Date(), // Current date as start of week
+          startDate: new Date(),
         },
         {
           headers: {
