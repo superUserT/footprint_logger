@@ -5,7 +5,7 @@
   "description": "Backend Logic for footprint Logger",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
+    "test": "jasmine",
     "start": "nodemon --ignore 'Logs/*.json' --ignore node_modules server.js"
   },
   "author": {
@@ -32,6 +32,7 @@
     "pino-pretty": "^13.1.1"
   },
   "devDependencies": {
-    "jasmine": "^5.10.0"
+    "jasmine": "^5.10.0",
+    "supertest": "^7.1.4"
   }
 }
