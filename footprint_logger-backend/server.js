@@ -14,8 +14,8 @@ const PORT = process.env.PORT || 3001;
 connectDB();
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:3001",
+  "https://logger-backend-r2uu.onrender.com",
+  "https://footprint-logger-frontend.onrender.com",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
