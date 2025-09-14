@@ -11,13 +11,13 @@ RUN npm install
 COPY . .
 
 # Build the app into "footprint_logger-application"
-RUN npm run build && mv dist footprint_logger-application
+RUN npm run build && mv dist build
 
 # ---- Production Stage ----
 FROM nginx:alpine
 
 # Copy built assets to nginx html folder
-COPY --from=build /usr/src/app/footprint_logger-application /usr/share/nginx/html
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
 # Expose port
 EXPOSE 9000
