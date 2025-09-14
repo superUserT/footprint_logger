@@ -29,8 +29,7 @@ import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 import EmissionSentimentAnalyzer from "../../../../insight_engine/insight_engine.js";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Dashboard = () => {
   const { user, token } = useAuth();

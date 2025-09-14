@@ -18,8 +18,7 @@ import { Add } from "@mui/icons-material";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const SubmitLog = () => {
   const [activity, setActivity] = useState("");
@@ -50,7 +49,7 @@ const SubmitLog = () => {
 
     if (selectedValue === "custom") {
       setCustomActivityDialogOpen(true);
-      setActivity(""); // Clear current selection
+      setActivity("");
     } else {
       setActivity(selectedValue);
       setDetails({});

@@ -12,8 +12,7 @@ import { Edit, Check } from "@mui/icons-material";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const WeeklyGoal = () => {
   const { user, token } = useAuth();
